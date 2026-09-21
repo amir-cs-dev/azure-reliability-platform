@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest requests httpx
+
+      - name: Run automated tests
+        run: python -m pytest -q
+
+      - name: Build Docker image
+        run: |
+          docker build -t reliability-platform:ci .
+
+      - name: Test container health
+        run: |
+          docker run -d \
+            --name reliability-ci \
+            -p 127.0.0.1:8001:8000 \
+            reliability-platform:ci
+
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent \
+              http://127.0.0.1:8001/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+
+          docker logs reliability-ci
+          exit 1
+
+      - name: Clean up container
+        if: always()
+        run: docker rm -f reliability-ci || true
