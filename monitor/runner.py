@@ -1,8 +1,36 @@
 import argparse
+import os
 import time
 
+from monitor.alerts import deliver_pending
 from monitor.checker import check_health
 from monitor.state import evaluate
+from monitor.storage import IncidentStore
+
+
+def dispatch_alerts(store, webhook_url):
+    """Attempt delivery without stopping health monitoring."""
+
+    if not webhook_url:
+        return None
+
+    try:
+        summary = deliver_pending(store, webhook_url)
+
+        if any(summary.values()):
+            print(
+                f"ALERT DELIVERY: {summary}",
+                flush=True,
+            )
+
+        return summary
+
+    except Exception as exc:
+        print(
+            f"ALERT DELIVERY ERROR: {exc}",
+            flush=True,
+        )
+        return None
 
 
 def run_monitor(
@@ -10,11 +38,22 @@ def run_monitor(
     threshold=2,
     count=None,
     db_path="data/incidents.sqlite3",
+    webhook_url=None,
 ):
-    # Import here so existing state-machine tests remain compatible.
-    from monitor.storage import IncidentStore
+    if interval <= 0:
+        raise ValueError("interval must be positive")
+
+    if threshold < 1:
+        raise ValueError("threshold must be at least 1")
+
+    if count is not None and count < 1:
+        raise ValueError("count must be positive")
 
     store = IncidentStore(db_path)
+
+    if webhook_url is None:
+        webhook_url = os.environ.get("WEBHOOK_URL")
+
     state = store.load_state()
 
     print(
@@ -22,10 +61,23 @@ def run_monitor(
         flush=True,
     )
 
+    if webhook_url:
+        print("Automatic alert delivery enabled.", flush=True)
+    else:
+        print(
+            "No WEBHOOK_URL configured. "
+            "Notifications will remain queued.",
+            flush=True,
+        )
+
+    # Recover eligible notifications left by a previous run.
+    dispatch_alerts(store, webhook_url)
+
     checks = 0
 
     try:
         while count is None or checks < count:
+
             result = check_health()
 
             state, event = store.record(
@@ -49,15 +101,23 @@ def run_monitor(
                     flush=True,
                 )
 
+            # Dispatch newly queued and previously failed alerts.
+            dispatch_alerts(store, webhook_url)
+
             if count is None or checks < count:
                 time.sleep(interval)
 
     except KeyboardInterrupt:
-        print("\nMonitoring stopped.")
+        print(
+            "\nMonitoring stopped.",
+            flush=True,
+        )
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="Persistent health monitoring"
+    )
 
     parser.add_argument(
         "--interval",

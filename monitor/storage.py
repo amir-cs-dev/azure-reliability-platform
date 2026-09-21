@@ -1,5 +1,7 @@
+import json
 import sqlite3
-from datetime import datetime
+from contextlib import contextmanager
+from datetime import datetime, timezone
 from pathlib import Path
 
 from monitor.state import evaluate
@@ -29,15 +31,38 @@ class IncidentStore:
             """)
 
             conn.execute("""
+                CREATE TABLE IF NOT EXISTS notifications (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    incident_id INTEGER NOT NULL,
+                    event TEXT NOT NULL,
+                    payload TEXT NOT NULL,
+                    status TEXT NOT NULL DEFAULT 'pending',
+                    attempts INTEGER NOT NULL DEFAULT 0,
+                    last_error TEXT,
+                    delivered_at TEXT,
+                    UNIQUE(incident_id, event),
+                    FOREIGN KEY(incident_id)
+                        REFERENCES incidents(id)
+                )
+            """)
+
+            conn.execute("""
                 INSERT OR IGNORE INTO monitor_state
                 (id, consecutive_failures, incident_open)
                 VALUES (1, 0, 0)
             """)
 
+    @contextmanager
     def connect(self):
         conn = sqlite3.connect(self.db_path, timeout=10)
         conn.row_factory = sqlite3.Row
-        return conn
+        conn.execute("PRAGMA foreign_keys = ON")
+
+        try:
+            with conn:
+                yield conn
+        finally:
+            conn.close()
 
     def load_state(self):
         with self.connect() as conn:
@@ -54,7 +79,8 @@ class IncidentStore:
 
     def record(self, result, threshold=2):
         """
-        Atomically update monitoring state and incident history.
+        Atomically update monitoring state, incident history,
+        and the notification queue.
         """
         with self.connect() as conn:
             conn.execute("BEGIN IMMEDIATE")
@@ -71,17 +97,40 @@ class IncidentStore:
             }
 
             new_state, event = evaluate(
-                state, result, threshold
+                state,
+                result,
+                threshold,
             )
 
             timestamp = result["timestamp"]
 
+            # Open a new incident and queue its notification.
             if event == "INCIDENT_OPENED":
-                conn.execute("""
+                cursor = conn.execute("""
                     INSERT INTO incidents (opened_at)
                     VALUES (?)
                 """, (timestamp,))
 
+                incident_id = cursor.lastrowid
+
+                payload = {
+                    "event": "INCIDENT_OPENED",
+                    "incident_id": incident_id,
+                    "timestamp": timestamp,
+                    "message": "Application health check failed",
+                }
+
+                conn.execute("""
+                    INSERT INTO notifications
+                    (incident_id, event, payload)
+                    VALUES (?, ?, ?)
+                """, (
+                    incident_id,
+                    event,
+                    json.dumps(payload),
+                ))
+
+            # Recover the existing incident and queue recovery.
             elif event == "RECOVERED":
                 incident = conn.execute("""
                     SELECT id, opened_at
@@ -99,7 +148,10 @@ class IncidentStore:
                 opened = datetime.fromisoformat(
                     incident["opened_at"]
                 )
-                recovered = datetime.fromisoformat(timestamp)
+
+                recovered = datetime.fromisoformat(
+                    timestamp
+                )
 
                 duration = max(
                     0.0,
@@ -120,6 +172,25 @@ class IncidentStore:
                     incident["id"],
                 ))
 
+                payload = {
+                    "event": "RECOVERED",
+                    "incident_id": incident["id"],
+                    "timestamp": timestamp,
+                    "duration_seconds": duration,
+                    "message": "Application health restored",
+                }
+
+                conn.execute("""
+                    INSERT INTO notifications
+                    (incident_id, event, payload)
+                    VALUES (?, ?, ?)
+                """, (
+                    incident["id"],
+                    event,
+                    json.dumps(payload),
+                ))
+
+            # Persist state within the same transaction.
             conn.execute("""
                 UPDATE monitor_state
                 SET consecutive_failures = ?,
@@ -142,3 +213,50 @@ class IncidentStore:
             """).fetchall()
 
         return [dict(row) for row in rows]
+
+    def pending_notifications(self):
+        with self.connect() as conn:
+            rows = conn.execute("""
+                SELECT id, incident_id, event, payload,
+                       status, attempts, last_error,
+                       delivered_at
+                FROM notifications
+                WHERE status = 'pending'
+                ORDER BY id
+            """).fetchall()
+
+        return [dict(row) for row in rows]
+
+    def mark_delivered(self, notification_id):
+        timestamp = datetime.now(timezone.utc).isoformat()
+
+        with self.connect() as conn:
+            cursor = conn.execute("""
+                UPDATE notifications
+                SET status = 'delivered',
+                    delivered_at = ?,
+                    last_error = NULL,
+                    attempts = attempts + 1
+                WHERE id = ?
+                  AND status = 'pending'
+            """, (
+                timestamp,
+                notification_id,
+            ))
+
+            return cursor.rowcount == 1
+
+    def mark_failed(self, notification_id, error):
+        with self.connect() as conn:
+            cursor = conn.execute("""
+                UPDATE notifications
+                SET attempts = attempts + 1,
+                    last_error = ?
+                WHERE id = ?
+                  AND status = 'pending'
+            """, (
+                str(error)[:500],
+                notification_id,
+            ))
+
+            return cursor.rowcount == 1
