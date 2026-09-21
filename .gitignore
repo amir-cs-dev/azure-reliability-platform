@@ -5,3 +5,5 @@ __pycache__/
 .env
 .env.*
 !.env.example
+# Runtime database files
+data/*.sqlite3*

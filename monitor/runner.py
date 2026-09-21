@@ -2,48 +2,37 @@ import argparse
 import time
 
 from monitor.checker import check_health
+from monitor.state import evaluate
 
 
-def evaluate(state, result, threshold=2):
-    """Evaluate one health result and update incident state."""
-    if threshold < 1:
-        raise ValueError("threshold must be at least 1")
+def run_monitor(
+    interval=10,
+    threshold=2,
+    count=None,
+    db_path="data/incidents.sqlite3",
+):
+    # Import here so existing state-machine tests remain compatible.
+    from monitor.storage import IncidentStore
 
-    new_state = state.copy()
+    store = IncidentStore(db_path)
+    state = store.load_state()
 
-    if result["healthy"]:
-        new_state["consecutive_failures"] = 0
-
-        if new_state["incident_open"]:
-            new_state["incident_open"] = False
-            return new_state, "RECOVERED"
-
-        return new_state, None
-
-    new_state["consecutive_failures"] += 1
-
-    if (
-        new_state["consecutive_failures"] >= threshold
-        and not new_state["incident_open"]
-    ):
-        new_state["incident_open"] = True
-        return new_state, "INCIDENT_OPENED"
-
-    return new_state, None
-
-
-def run_monitor(interval=10, threshold=2, count=None):
-    state = {
-        "consecutive_failures": 0,
-        "incident_open": False,
-    }
+    print(
+        f"Restored state: {state}",
+        flush=True,
+    )
 
     checks = 0
 
     try:
         while count is None or checks < count:
             result = check_health()
-            state, event = evaluate(state, result, threshold)
+
+            state, event = store.record(
+                result,
+                threshold,
+            )
+
             checks += 1
 
             print(
@@ -55,7 +44,10 @@ def run_monitor(interval=10, threshold=2, count=None):
             )
 
             if event:
-                print(f"EVENT: {event}", flush=True)
+                print(
+                    f"EVENT: {event}",
+                    flush=True,
+                )
 
             if count is None or checks < count:
                 time.sleep(interval)
@@ -66,16 +58,43 @@ def run_monitor(interval=10, threshold=2, count=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--interval", type=float, default=10)
-    parser.add_argument("--threshold", type=int, default=2)
-    parser.add_argument("--count", type=int, default=None)
+
+    parser.add_argument(
+        "--interval",
+        type=float,
+        default=10,
+    )
+
+    parser.add_argument(
+        "--threshold",
+        type=int,
+        default=2,
+    )
+
+    parser.add_argument(
+        "--count",
+        type=int,
+        default=None,
+    )
+
+    parser.add_argument(
+        "--db",
+        default="data/incidents.sqlite3",
+    )
 
     args = parser.parse_args()
 
     if args.interval <= 0 or args.threshold < 1:
-        parser.error("interval must be positive and threshold >= 1")
+        parser.error(
+            "interval must be positive and threshold >= 1"
+        )
 
     if args.count is not None and args.count < 1:
         parser.error("count must be positive")
 
-    run_monitor(args.interval, args.threshold, args.count)
+    run_monitor(
+        interval=args.interval,
+        threshold=args.threshold,
+        count=args.count,
+        db_path=args.db,
+    )
