@@ -8,6 +8,24 @@ from monitor.state import evaluate
 from monitor.storage import IncidentStore
 
 
+def create_store(db_path="data/incidents.sqlite3", database_url=None):
+    """
+    Select the persistence backend.
+
+    PostgreSQL is used when DATABASE_URL is configured.
+    SQLite remains the default for local development and tests.
+    """
+    if database_url is None:
+        database_url = os.environ.get("DATABASE_URL")
+
+    if database_url:
+        from monitor.postgres_storage import PostgresIncidentStore
+
+        return PostgresIncidentStore(database_url)
+
+    return IncidentStore(db_path)
+
+
 def dispatch_alerts(store, webhook_url):
     """Attempt delivery without stopping health monitoring."""
 
@@ -39,7 +57,18 @@ def run_monitor(
     count=None,
     db_path="data/incidents.sqlite3",
     webhook_url=None,
+    database_url=None,
 ):
+    """
+    Execute health monitoring with persistent incident tracking.
+
+    Storage:
+        DATABASE_URL configured -> PostgreSQL
+        Otherwise               -> SQLite
+
+    Monitoring continues when webhook delivery fails.
+    """
+
     if interval <= 0:
         raise ValueError("interval must be positive")
 
@@ -49,7 +78,11 @@ def run_monitor(
     if count is not None and count < 1:
         raise ValueError("count must be positive")
 
-    store = IncidentStore(db_path)
+    # Initialize storage before attempting to restore state.
+    store = create_store(
+        db_path=db_path,
+        database_url=database_url,
+    )
 
     if webhook_url is None:
         webhook_url = os.environ.get("WEBHOOK_URL")
@@ -62,7 +95,10 @@ def run_monitor(
     )
 
     if webhook_url:
-        print("Automatic alert delivery enabled.", flush=True)
+        print(
+            "Automatic alert delivery enabled.",
+            flush=True,
+        )
     else:
         print(
             "No WEBHOOK_URL configured. "
@@ -70,7 +106,7 @@ def run_monitor(
             flush=True,
         )
 
-    # Recover eligible notifications left by a previous run.
+    # Recover eligible notifications from previous runs.
     dispatch_alerts(store, webhook_url)
 
     checks = 0
@@ -115,6 +151,7 @@ def run_monitor(
 
 
 if __name__ == "__main__":
+
     parser = argparse.ArgumentParser(
         description="Persistent health monitoring"
     )
@@ -140,6 +177,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--db",
         default="data/incidents.sqlite3",
+        help="SQLite database path when DATABASE_URL is not set.",
     )
 
     args = parser.parse_args()

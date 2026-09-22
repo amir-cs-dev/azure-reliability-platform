@@ -25,3 +25,9 @@ def test_unknown_endpoint():
     response = client.get("/nonexistent")
 
     assert response.status_code == 404
+
+
+def test_ready_endpoint():
+    response = client.get("/ready")
+    assert response.status_code == 200
+    assert response.json() == {"status": "ready"}

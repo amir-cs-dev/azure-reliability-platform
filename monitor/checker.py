@@ -1,9 +1,13 @@
 import time
+import os
 from datetime import datetime, timezone
 
 import requests
 
-TARGET_URL = "http://127.0.0.1:8000/health"
+TARGET_URL = os.environ.get(
+    "TARGET_URL",
+    "http://127.0.0.1:8000/health",
+)
 
 
 def check_health(url=TARGET_URL):
