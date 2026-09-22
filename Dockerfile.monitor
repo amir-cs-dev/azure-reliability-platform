@@ -11,6 +11,8 @@ RUN apt-get update \
     && pip install --no-cache-dir "requests==2.32.5" "psycopg[binary]>=3.2,<4" \
     && useradd --create-home monitoruser
 COPY monitor/ ./monitor/
-RUN test -s /etc/ssl/certs/ca-certificates.crt
+RUN test -s /etc/ssl/certs/ca-certificates.crt \
+    && rm -f /app/monitor/azure-roots.pem \
+    && ln -s /etc/ssl/certs/ca-certificates.crt /app/monitor/azure-roots.pem
 USER monitoruser
 CMD ["python", "-m", "monitor.runner", "--interval", "10", "--threshold", "2", "--db", "/tmp/incidents.sqlite3"]
