@@ -7,3 +7,24 @@ __pycache__/
 !.env.example
 # Runtime database files
 data/*.sqlite3*
+
+# Terraform local state and sensitive files
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfplan
+crash.log
+crash.*.log
+# Terraform state and local execution artifacts
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.auto.tfvars
+crash.log
+crash.*.log
+.arp-overlay-backup-*/
+*.pem
+.terraform/

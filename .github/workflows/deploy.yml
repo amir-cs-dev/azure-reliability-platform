@@ -1,0 +1,77 @@
+name: Deploy Azure applications
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arp-deployment
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+  deploy:
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Azure login with workload identity
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Resolve existing registry
+        shell: bash
+        run: |
+          set -euo pipefail
+          ACR=$(az acr list --resource-group rg-arp-app-wus3 --query '[0].name' -o tsv)
+          test -n "$ACR"
+          echo "ACR=$ACR" >> "$GITHUB_ENV"
+          echo "REGISTRY=$ACR.azurecr.io" >> "$GITHUB_ENV"
+      - name: Build immutable images
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build -t "$REGISTRY/reliability-api:$GITHUB_SHA" .
+          docker build -f Dockerfile.monitor -t "$REGISTRY/reliability-monitor:$GITHUB_SHA" .
+      - name: Push immutable images to existing ACR
+        shell: bash
+        run: |
+          set -euo pipefail
+          az acr login --name "$ACR"
+          docker push "$REGISTRY/reliability-api:$GITHUB_SHA"
+          docker push "$REGISTRY/reliability-monitor:$GITHUB_SHA"
+      - name: Deploy both existing Container Apps (preserve secrets and environment)
+        shell: bash
+        run: |
+          set -euo pipefail
+          az containerapp update --resource-group rg-arp-app-wus3 --name ca-arp-api-wus3 --image "$REGISTRY/reliability-api:$GITHUB_SHA" -o none
+          az containerapp update --resource-group rg-arp-app-wus3 --name ca-arp-monitor-wus3 --image "$REGISTRY/reliability-monitor:$GITHUB_SHA" -o none
+      - name: Verify API and monitor deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          API_IMAGE=$(az containerapp show -g rg-arp-app-wus3 -n ca-arp-api-wus3 --query 'properties.template.containers[0].image' -o tsv)
+          MONITOR_IMAGE=$(az containerapp show -g rg-arp-app-wus3 -n ca-arp-monitor-wus3 --query 'properties.template.containers[0].image' -o tsv)
+          test "$API_IMAGE" = "$REGISTRY/reliability-api:$GITHUB_SHA"
+          test "$MONITOR_IMAGE" = "$REGISTRY/reliability-monitor:$GITHUB_SHA"
+          FQDN=$(az containerapp show -g rg-arp-app-wus3 -n ca-arp-api-wus3 --query 'properties.configuration.ingress.fqdn' -o tsv)
+          test -n "$FQDN"
+          for attempt in $(seq 1 24); do
+            if curl --fail --silent --show-error --max-time 10 "https://$FQDN/health" && curl --fail --silent --show-error --max-time 10 "https://$FQDN/ready"; then
+              exit 0
+            fi
+            sleep 5
+          done
+          exit 1

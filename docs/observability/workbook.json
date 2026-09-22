@@ -1,0 +1,108 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "# Azure Reliability Platform \u2014 observed signals\nAvailability is sampled from **external monitor logs**, not a continuous SLA. Application request telemetry appears after Application Insights is provisioned and the instrumented image is deployed. Historical PostgreSQL check rows are independent evidence; workbook queries read Log Analytics, not PostgreSQL directly."
+      },
+      "name": "scope"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "ContainerAppConsoleLogs_CL | where TimeGenerated > ago(24h) and ContainerAppName_s == 'ca-arp-monitor-wus3' | where Log_s contains ' | healthy=' | extend healthy = extract(@'healthy=(True|False)', 1, Log_s) | where isnotempty(healthy) | summarize Checks=count(), Healthy=countif(healthy == 'True'), AvailabilityPercent=round(100.0 * countif(healthy == 'True') / count(),2)",
+        "size": 0,
+        "title": "Sampled availability",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "__ARP_LOG_WORKSPACE_ID__"
+        ]
+      },
+      "name": "Sampled availability"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "ContainerAppConsoleLogs_CL | where TimeGenerated > ago(24h) and ContainerAppName_s == 'ca-arp-monitor-wus3' | where Log_s contains ' | latency=' | extend latency= todouble(extract(@'latency=([0-9.]+)ms',1,Log_s)) | where isnotnull(latency) | summarize AverageLatencyMs=avg(latency), P95LatencyMs=percentile(latency,95) by bin(TimeGenerated,5m) | order by TimeGenerated asc",
+        "size": 0,
+        "title": "External checker latency by five minutes",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "__ARP_LOG_WORKSPACE_ID__"
+        ],
+        "visualization": "timechart"
+      },
+      "name": "External checker latency by five minutes"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "ContainerAppConsoleLogs_CL | where TimeGenerated > ago(7d) and ContainerAppName_s == 'ca-arp-monitor-wus3' | where Log_s has 'EVENT:' or Log_s has 'Restored state:' | project TimeGenerated, RevisionName_s, Log_s | order by TimeGenerated desc | take 100",
+        "size": 0,
+        "title": "Recent incident events and deployed monitor revision",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "__ARP_LOG_WORKSPACE_ID__"
+        ]
+      },
+      "name": "Recent incident events and deployed monitor revision"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AppRequests | where TimeGenerated > ago(24h) | summarize Requests=count(), Errors=countif(Success == false), MeanMs=avg(DurationMs), P95Ms=percentile(DurationMs,95) by bin(TimeGenerated,5m) | order by TimeGenerated asc",
+        "size": 0,
+        "title": "Application request volume, errors, and latency",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "__ARP_LOG_WORKSPACE_ID__"
+        ],
+        "visualization": "timechart"
+      },
+      "name": "Application request volume, errors, and latency"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "AppExceptions | where TimeGenerated > ago(7d) | project TimeGenerated, ProblemId, OuterMessage | order by TimeGenerated desc | take 50",
+        "size": 0,
+        "title": "Application exceptions",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "__ARP_LOG_WORKSPACE_ID__"
+        ]
+      },
+      "name": "Application exceptions"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "ContainerAppSystemLogs_CL | where TimeGenerated > ago(7d) and ContainerAppName_s == 'ca-arp-api-wus3' | project TimeGenerated, RevisionName_s, Log_s | order by TimeGenerated desc | take 100",
+        "size": 0,
+        "title": "Application revisions and deployment diagnostics",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "__ARP_LOG_WORKSPACE_ID__"
+        ]
+      },
+      "name": "Application revisions and deployment diagnostics"
+    }
+  ],
+  "isLocked": false,
+  "fallbackResourceIds": [
+    "__ARP_LOG_WORKSPACE_ID__"
+  ]
+}
