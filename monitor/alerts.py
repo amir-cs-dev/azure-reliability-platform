@@ -94,6 +94,7 @@ def deliver_pending(
             data=payload,
             headers={
                 "Content-Type": "application/json",
+                "User-Agent": "ARP-Reliability-Platform/1.0",
                 "X-Idempotency-Key": idempotency_key,
             },
             method="POST",
