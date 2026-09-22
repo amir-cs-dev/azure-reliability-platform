@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import time
 
@@ -72,9 +73,25 @@ def deliver_pending(
             f"{notification['event']}"
         )
 
+        payload = notification["payload"].encode("utf-8")
+
+        parsed_url = urlsplit(webhook_url)
+        if (
+            parsed_url.hostname in ("discord.com", "discordapp.com")
+            and parsed_url.path.startswith("/api/webhooks/")
+        ):
+            message = (
+                "Azure Reliability Platform alert\n"
+                + notification["payload"][:1800]
+            )
+            payload = json.dumps(
+                {"content": message},
+                ensure_ascii=False,
+            ).encode("utf-8")
+
         request = Request(
             webhook_url,
-            data=notification["payload"].encode("utf-8"),
+            data=payload,
             headers={
                 "Content-Type": "application/json",
                 "X-Idempotency-Key": idempotency_key,
