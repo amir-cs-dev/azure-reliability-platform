@@ -62,16 +62,4 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          API_IMAGE=$(az containerapp show -g rg-arp-app-wus3 -n ca-arp-api-wus3 --query 'properties.template.containers[0].image' -o tsv)
-          MONITOR_IMAGE=$(az containerapp show -g rg-arp-app-wus3 -n ca-arp-monitor-wus3 --query 'properties.template.containers[0].image' -o tsv)
-          test "$API_IMAGE" = "$REGISTRY/reliability-api:$GITHUB_SHA"
-          test "$MONITOR_IMAGE" = "$REGISTRY/reliability-monitor:$GITHUB_SHA"
-          FQDN=$(az containerapp show -g rg-arp-app-wus3 -n ca-arp-api-wus3 --query 'properties.configuration.ingress.fqdn' -o tsv)
-          test -n "$FQDN"
-          for attempt in $(seq 1 24); do
-            if curl --fail --silent --show-error --max-time 10 "https://$FQDN/health" | python -c 'import json,sys; sys.exit(0 if json.load(sys.stdin).get("status") == "healthy" else 1)' && curl --fail --silent --show-error --max-time 10 "https://$FQDN/ready"; then
-              exit 0
-            fi
-            sleep 5
-          done
-          exit 1
+          python3 scripts/verify_deploy.py
