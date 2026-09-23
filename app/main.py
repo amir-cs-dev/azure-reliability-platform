@@ -43,7 +43,7 @@ def root():
 
 @app.get("/health")
 def health():
-    return {"status": "healthy"}
+    return {"status": "degraded" if os.environ.get("ARP_PHASE8_FAULT") == "invalid_health" else "healthy"}
 
 
 @app.get("/ready")
