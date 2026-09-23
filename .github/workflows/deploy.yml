@@ -69,7 +69,7 @@ jobs:
           FQDN=$(az containerapp show -g rg-arp-app-wus3 -n ca-arp-api-wus3 --query 'properties.configuration.ingress.fqdn' -o tsv)
           test -n "$FQDN"
           for attempt in $(seq 1 24); do
-            if curl --fail --silent --show-error --max-time 10 "https://$FQDN/health" && curl --fail --silent --show-error --max-time 10 "https://$FQDN/ready"; then
+            if curl --fail --silent --show-error --max-time 10 "https://$FQDN/health" | python -c 'import json,sys; sys.exit(0 if json.load(sys.stdin).get("status") == "healthy" else 1)' && curl --fail --silent --show-error --max-time 10 "https://$FQDN/ready"; then
               exit 0
             fi
             sleep 5
