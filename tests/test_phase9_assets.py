@@ -43,6 +43,16 @@ def test_application_uses_digest_probes_limits_and_rolling_update():
     assert "path: /health" in deployment
     assert "toYaml .Values.application.resources" in deployment
     assert "ARP_PHASE8_FAULT" in deployment
+    assert "runAsUser: 1000" in deployment
+
+
+def test_named_non_root_observability_images_use_numeric_uids():
+    observability = read(CHART / "templates" / "observability.yaml")
+    kube_state_metrics = read(CHART / "templates" / "kube-state-metrics.yaml")
+
+    assert observability.count("runAsUser: 65534") == 2
+    assert "runAsUser: 472" in observability
+    assert "runAsUser: 65534" in kube_state_metrics
 
 
 def test_prometheus_alertmanager_and_external_secret_flow_are_real():
