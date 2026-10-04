@@ -45,3 +45,28 @@ output "reliability_workbook_id" {
   value       = azurerm_application_insights_workbook.reliability.id
   description = "Azure Monitor Workbook ID."
 }
+
+output "function_app_name" {
+  value       = azurerm_function_app_flex_consumption.monitor.name
+  description = "Timer-triggered reliability monitor Function App."
+}
+
+output "function_service_plan_name" {
+  value       = azurerm_service_plan.function.name
+  description = "Flex Consumption hosting plan for the monitor Function."
+}
+
+output "function_storage_account_name" {
+  value       = azurerm_storage_account.function.name
+  description = "Managed-identity-only host and deployment storage for the Function."
+}
+
+output "function_key_vault_name" {
+  value       = azurerm_key_vault.function.name
+  description = "Vault containing Function runtime secret values populated out of band."
+}
+
+output "function_managed_identity_name" {
+  value       = azurerm_user_assigned_identity.function.name
+  description = "User-assigned identity used for Function storage access."
+}

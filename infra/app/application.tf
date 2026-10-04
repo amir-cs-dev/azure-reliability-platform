@@ -85,6 +85,15 @@ resource "azurerm_container_app" "app" {
 
   tags = local.tags
 
+  # Runtime settings are preserved and updated by the application deployment
+  # workflow. Reconciling them here would create an unrelated API revision
+  # during an infrastructure-only Function apply.
+  lifecycle {
+    ignore_changes = [
+      template[0].container[0].env,
+    ]
+  }
+
   depends_on = [
     azurerm_role_assignment.acr_pull
   ]

@@ -1,3 +1,6 @@
+from unittest.mock import Mock
+
+from monitor import runner
 from monitor.runner import evaluate
 
 
@@ -70,3 +73,38 @@ def test_invalid_threshold():
 
     with pytest.raises(ValueError):
         evaluate(initial_state(), health(False), threshold=0)
+
+
+def test_run_monitor_once_uses_checker_store_and_delivery(monkeypatch):
+    result = {
+        "timestamp": "2026-10-04T12:00:00+00:00",
+        "healthy": True,
+        "status_code": 200,
+        "latency_ms": 4.5,
+        "error": None,
+    }
+    store = Mock()
+    store.record.return_value = (initial_state(), None)
+    checker = Mock(return_value=result)
+    dispatch = Mock(return_value={"delivered": 0})
+
+    monkeypatch.setattr(runner, "check_health", checker)
+    monkeypatch.setattr(runner, "dispatch_alerts", dispatch)
+
+    cycle = runner.run_monitor_once(
+        store=store,
+        threshold=3,
+        target_url="https://api.example.invalid/health",
+        webhook_url="https://hooks.example.invalid/notify",
+    )
+
+    checker.assert_called_once_with(
+        "https://api.example.invalid/health",
+    )
+    store.record.assert_called_once_with(result, 3)
+    dispatch.assert_called_once_with(
+        store,
+        "https://hooks.example.invalid/notify",
+    )
+    assert cycle["result"] == result
+    assert cycle["state"] == initial_state()

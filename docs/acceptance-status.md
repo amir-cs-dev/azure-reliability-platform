@@ -14,7 +14,7 @@ demonstrations.
 | 1 — Monitored application | Complete | 8 focused endpoint/fault tests and 62 current full-suite tests pass | Normal app plus semantic-health and HTTP-500 faults demonstrated from one Docker image | [ACT-1 application and Docker evidence](phase1-application.md) | **PASS** | None. Both faults are environment-driven; no public fault-control endpoint exists. |
 | 2 — External checker | Complete | 6 focused checker tests, 14 checker/history/runner tests, and 62 full-suite tests pass | Healthy, HTTP failure, semantic invalidity, timeout, connection failure, invalid JSON, and complete result shape demonstrated | [ACT-2 external checker evidence](phase2-external-checker.md) | **PASS** | None. Every success and failure path returns timestamp, classification/status, latency, and applicable error information. |
 | 3 — Azure workload | Complete | Deployment checks exist | Externally reachable Azure deployment established | Existing cloud evidence | **PASS** | None. |
-| 4 — Monitoring service | Container App monitor works; authoritative Function absent | Monitor tests pass | Container App operation demonstrated | Container App logs and persistence exist | **MISMATCH / OPEN** | Specification requires a Python timer-triggered Azure Function and Terraform-managed Function resources. Implement that path or obtain explicit approval for a specification amendment. |
+| 4 — Monitoring service | Python timer adapter and Terraform Flex Consumption resources implemented; Container App remains active pending safe cutover | 10 new Function/packaging/shared-cycle tests and 72 full-suite tests pass | Local package and plan demonstrated; live scheduled Azure execution pending | [ACT-4 Azure Function evidence](phase4-azure-function.md) | **OPEN** | Merge the implementation, review/apply the exact Terraform plan, safely disable the old scheduler, and prove multiple scheduled executions, persisted rows, and logs in Azure. |
 | 5 — Incident lifecycle | Complete | Deterministic PostgreSQL overlap test plus lifecycle/dedup suites pass | Incident #2 lifecycle demonstrated; two overlapping threshold checks serialize to one opening | [Incident #2 report](incidents/incident-002.md) and [concurrency proof](phase5-concurrency.md) | **PASS** | None. The production state-row lock was directly observed blocking the second execution; exactly one incident and one opening-notification row persisted. |
 | 6 — CI/CD and infrastructure automation | Complete | Current suite: 62 passed; 14 focused control tests; 4 verifier tests | Reviewed normal/refresh plans, separate approved state-only apply, live rejection controls, failed-test deployment block, and healthy Deploy #5 demonstrated | [ACT-6 acceptance evidence](ci-cd/phase6-acceptance.md) | **PASS** | None. Approval is an explicitly demonstrated solo-operator manual boundary, not a claimed GitHub required-reviewer environment. |
 | 7 — Observability | Complete for current architecture | Current suite: 62 passed; Phase 8 subset: 8 passed | Incident #2 signals correlated across deployment, checker, App Insights, lifecycle, notification, rollback, and recovery | [Incident #2 timeline](incidents/incident-002.md) and [App Insights evidence](incidents/evidence/incident-002-app-insights.md) | **PASS** | None for ACT-7. Signal limitations and the bounded causal inference are documented. |
@@ -65,3 +65,14 @@ cover every authoritative requirement. No redundant test or implementation was
 added. The six focused checker tests, fourteen checker/history/runner tests, and
 the full 62-test PostgreSQL-backed suite pass. The exact evidence matrix is in
 `docs/phase2-external-checker.md`, and Phase 2 is now unambiguously **PASS**.
+
+## Mission 5 Stage B implementation status
+
+The authoritative Python timer Function adapter and Terraform resources are
+implemented and locally verified. The existing checker, PostgreSQL store,
+locking, lifecycle, notification, and alert paths are reused. The pre-creation
+plan is limited to nine creates with zero updates, replacements, or destroys.
+Phase 4 remains **OPEN** until the implementation is merged, its exact
+main-branch plan is manually approved and applied, the old scheduler is safely
+deactivated, and multiple scheduled Azure executions are correlated with
+persisted check rows and logs.

@@ -27,6 +27,8 @@ def test_plan_is_separate_from_apply_and_retains_review_artifact():
     assert "plan.tfplan" in plan
     assert "plan.txt" in plan
     assert "metadata.json" in plan
+    assert "TF_VAR_monitor_target_url" in plan
+    assert "TF_VAR_key_vault_operator_object_id" in plan
     assert '"$RUNNER_TEMP/plan.json"' in plan
     assert "retention-days: 7" in plan
 
