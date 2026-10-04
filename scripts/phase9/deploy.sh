@@ -44,7 +44,7 @@ az acr build \
 digest=$(az acr manifest list-metadata \
   --registry "$registry" \
   --name "$repository" \
-  --query "[?contains(tags, '$image_tag')].digest | [0]" \
+  --query "[?tags != null && contains(tags, '$image_tag')].digest | [0]" \
   --output tsv)
 [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]] || {
   echo "Unable to resolve the immutable ACR image digest." >&2

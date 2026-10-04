@@ -89,3 +89,9 @@ def test_experiment_has_real_fault_rollout_rollback_and_external_checker():
     assert "external-checker-baseline.json" in experiment
     assert "target_switched_at" in experiment
     assert "external-checker-recovery.json" in experiment
+
+
+def test_deploy_digest_lookup_ignores_untagged_acr_manifests():
+    deploy = read(ROOT / "scripts" / "phase9" / "deploy.sh")
+
+    assert "tags != null && contains(tags, '$image_tag')" in deploy
