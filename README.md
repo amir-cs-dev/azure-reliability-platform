@@ -122,6 +122,8 @@ ACT-1 is closed by the [Phase 1 application and Docker evidence](docs/phase1-app
 
 The first fault violates the semantic body contract while retaining HTTP success; the second is a distinct HTTP status failure. Normal production behavior remains the default when the variable is unset.
 
+ACT-2 is closed by the [external checker acceptance evidence](docs/phase2-external-checker.md). The checker distinguishes transport, HTTP, and semantic failures while returning a consistent timestamp/classification/status/latency/error record.
+
 ### CI/CD and infrastructure approval
 
 ACT-6 is closed by the [Phase 6 CI/CD acceptance evidence](docs/ci-cd/phase6-acceptance.md). Pull requests receive full validation, while trusted `main` produces a retained Terraform plan. Infrastructure apply is a separate manual workflow that requires the reviewed plan run ID and literal `APPLY`, verifies the exact source/configuration/state/artifact, and uses an apply-only OIDC identity. A safe refresh-only apply and live rejection/failing-test experiments demonstrate the controls without creating a production revision or outage.
