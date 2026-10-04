@@ -2,8 +2,8 @@
 
 Date: 2026-10-04 UTC
 
-Current verdict: **IMPLEMENTED AND STATICALLY VALIDATED; STAGE 2 APPROVED BUT
-BLOCKED BY AZURE DASV5 QUOTA; LIVE ACCEPTANCE OPEN**
+Current verdict: **IMPLEMENTED AND STATICALLY VALIDATED; D2AS_V4 PROVISIONING
+APPROVED; FRESH PLAN AND LIVE ACCEPTANCE OPEN**
 
 Phase 9 is not PASS. Stage 1 deliberately stopped before an AKS apply. The
 authoritative sequence remains implemented, tested, demonstrated, evidenced,
@@ -15,7 +15,10 @@ must be added under [evidence/](evidence/) during Stage 2.
 The operator approved the exact Stage 1 resource envelope. The subsequent
 [Stage 2 preflight](stage2-preflight.md) found zero West US 3 DASv5-family
 vCPU quota, and Azure rejected two exact 2-vCPU requests. No apply occurred and
-no substitute compute was selected.
+no substitute compute was selected during that attempt. The operator then
+approved the single substitution to one fixed `Standard_D2as_v4` node after
+availability, matching 2-vCPU/8-GiB capacity, and sufficient DASv4-family quota
+were verified. Every other envelope constraint remains unchanged.
 
 ## Architecture
 

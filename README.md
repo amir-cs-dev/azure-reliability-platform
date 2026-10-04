@@ -146,9 +146,10 @@ Grafana, Alertmanager, kube-state-metrics, a real rolling-failure/rollback
 experiment, and controlled teardown. The [resource and cost
 gate](docs/phase9/cost-gate.md) is approved. No AKS resource has been applied
 and Phase 9 remains OPEN. The [Stage 2
-preflight](docs/phase9/stage2-preflight.md) records that Azure
-rejected the minimum DASv5-family quota increase; provisioning is blocked
-without substituting unapproved compute.
+preflight](docs/phase9/stage2-preflight.md) records Azure's rejection of the
+minimum DASv5-family quota increase and the operator's subsequent approval of
+the single `Standard_D2as_v4` substitution. A fresh trusted-main plan must pass
+the unchanged material-envelope audit before apply.
 
 ## Technology Stack
 
@@ -182,8 +183,6 @@ CI, application deployment, Terraform planning, and operator-approved Terraform 
 
 **Remaining authoritative work**
 
-* Resolve the approved `Standard_D2as_v5` family quota or approve a revised
-  compute plan.
 * Live AKS provisioning, deployment, reliability experiment, evidence, and teardown.
 
 **Planned**

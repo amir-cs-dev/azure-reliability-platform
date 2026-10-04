@@ -2,13 +2,20 @@
 
 Date: 2026-10-04 UTC
 
-Verdict: **APPROVED RESOURCE ENVELOPE; PROVISIONING BLOCKED BY AZURE QUOTA**
+Verdict: **DASV5 BLOCKER RESOLVED BY APPROVED D2AS_V4 SUBSTITUTION; FRESH PLAN REQUIRED**
 
 The operator explicitly approved the Stage 2 cost envelope: Free-tier AKS,
 one fixed `Standard_D2as_v5` system node, no other node pools, in-cluster
 Prometheus/Grafana/Alertmanager/kube-state-metrics, existing ACR, external
 Function checker, no new database, and no unrelated network or platform
 services.
+
+After Azure rejected the required DASv5 quota, the operator approved exactly
+one change: use one fixed `Standard_D2as_v4` system node instead. Azure reports
+the SKU available without a location restriction, with the same 2 vCPU / 8 GiB
+class, and reports a DASv4-family quota limit of 10 vCPUs with zero consumed.
+The Free tier, node count, autoscaling setting, region, disk, networking,
+observability, shared-resource boundaries, and teardown scope remain unchanged.
 
 ## Source and integration state
 
@@ -47,8 +54,9 @@ exactly 2 DASv5 vCPUs. Requests
 `d610ea0d-8a2b-4120-9497-125db9738294` both ended `Failed` with
 `QuotaNotAvailableForResource`. The limit remains zero.
 
-No alternate VM family, region, or node count was selected. No AKS cluster
-exists and Azure reports the planned node resource group absent.
+No alternate VM family, region, or node count was selected during this failed
+attempt. No AKS cluster exists and Azure reports the planned node resource
+group absent.
 
 ## Secretless apply identity
 
@@ -104,20 +112,19 @@ assignment, and operator cluster-RBAC assignment. There are no unrelated or
 destructive actions.
 
 No apply workflow was dispatched. This evidence update advances `main`, so the
-retained plan is intentionally stale and cannot be applied. After quota is
-available, a new current-`main` plan must pass the same audit.
+retained plan is intentionally stale and cannot be applied.
 
-## Blocking condition and allowed continuation
+## Approved continuation
 
-An AKS apply with a zero family quota would risk a partial failed deployment.
-It is therefore prohibited. Execution may resume only after one of these
-conditions is explicitly resolved:
+An AKS apply with the zero-quota DASv5 family remains prohibited. The operator
+has resolved the blocker by approving only the D2as_v4 substitution. Execution
+may proceed only after a new current-`main` plan proves all of the following:
 
-1. Azure grants at least 2 `standardDASv5Family` vCPUs in West US 3, preserving
-   the approved plan unchanged; or
-2. the operator separately approves a changed VM family/region and its updated
-   cost/resource plan.
+1. the system pool remains exactly one fixed D2as_v4 node with autoscaling off;
+2. the plan contains only the AKS cluster and the two scoped role assignments;
+3. it contains no update, replacement, or destroy outside isolated Phase 9;
+4. every other approved resource and teardown constraint remains unchanged.
 
-Phase 9 remains OPEN. No ACT-9 live row or teardown row passes from this
-preflight.
-
+Any material difference beyond the approved SKU substitution requires new
+approval. Phase 9 remains OPEN. No ACT-9 live row or teardown row passes from
+this preflight.
