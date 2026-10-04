@@ -2,10 +2,12 @@
 
 Date: 2026-10-04 UTC
 
-Decision state: **AWAITING EXPLICIT OPERATOR APPROVAL — DO NOT APPLY**
+Decision state: **APPROVED AS DESIGNED; APPLY BLOCKED BY ZERO DASV5 QUOTA**
 
-This is the mandatory Stage 1 stop gate. The local Terraform plan was created
-against the isolated AzureRM state key and was not applied.
+The operator approved this exact resource envelope. The local and fresh
+trusted-main plans were not applied because Azure reports zero DASv5-family
+vCPU quota and rejected the minimum 2-vCPU increase. See the [Stage 2
+preflight](stage2-preflight.md).
 
 ## Terraform plan summary
 
@@ -25,19 +27,19 @@ There are no planned updates, replacements, or deletes. Existing
 `rg-arp-app-wus3` and ACR `arp3e6c8737fb3a44be8477` are data sources, not
 managed resources in this state. `infra/bootstrap` is excluded.
 
-Read-only Azure preflight also confirmed that no cluster named
+Stage 1 read-only Azure preflight also confirmed that no cluster named
 `aks-arp-phase9-wus3` exists and the planned node resource group is absent.
 `Microsoft.ContainerService`, `Microsoft.Compute`, and `Microsoft.Network`
-currently report `NotRegistered`; no registration was performed in Stage 1.
-After approval, the operator must register these three providers and wait for
-`Registered` before generating the final apply-eligible plan. Provider
+reported `NotRegistered`; no registration was performed in Stage 1. After
+approval, the operator registered only these three deployment providers and
+waited for `Registered` before generating the fresh plan. Provider
 registration is a subscription-level prerequisite but does not itself create
 the billable lab resources. AzureRM is configured with automatic provider
 registration disabled so this mutation cannot happen implicitly.
 Subscription quota for the selected compute family could not be enumerated
-while `Microsoft.Compute` was unregistered. Stage 2 must stop if two vCPUs or
-the selected SKU are unavailable; changing the node SKU or count requires an
-updated plan and cost approval.
+while `Microsoft.Compute` was unregistered. Stage 2 then found zero DASv5
+family quota and both exact 2-vCPU requests failed. Changing the node SKU,
+region, or count requires an updated plan and cost approval.
 
 The AKS service will create supporting objects in its dedicated managed node
 resource group `rg-arp-phase9-nodes-wus3`. Expected platform-managed resources
@@ -186,5 +188,6 @@ ACT-9 requirement.
 ## Approval boundary
 
 No command in Stage 1 created AKS or another materially billable Phase 9
-resource. Explicit operator approval of this resource/cost gate and the final
-trusted-`main` plan is required before the manual apply workflow may be used.
+resource. The operator subsequently approved this envelope. Apply remains
+prohibited until the exact compute quota is available and a fresh
+trusted-`main` plan passes the same material-envelope audit.

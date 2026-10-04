@@ -2,14 +2,20 @@
 
 Date: 2026-10-04 UTC
 
-Stage 1 verdict: **IMPLEMENTED AND STATICALLY VALIDATED; LIVE ACCEPTANCE OPEN**
+Current verdict: **IMPLEMENTED AND STATICALLY VALIDATED; STAGE 2 APPROVED BUT
+BLOCKED BY AZURE DASV5 QUOTA; LIVE ACCEPTANCE OPEN**
 
-Phase 9 is not PASS. This package deliberately stops before an AKS apply. The
+Phase 9 is not PASS. Stage 1 deliberately stopped before an AKS apply. The
 authoritative sequence remains implemented, tested, demonstrated, evidenced,
 then PASS. The resource and cost gate is in [cost-gate.md](cost-gate.md), the
 exact Stage 1 results are in [stage1-validation.md](stage1-validation.md), the
 controlled live procedure is in [runbook.md](runbook.md), and live evidence
 must be added under [evidence/](evidence/) during Stage 2.
+
+The operator approved the exact Stage 1 resource envelope. The subsequent
+[Stage 2 preflight](stage2-preflight.md) found zero West US 3 DASv5-family
+vCPU quota, and Azure rejected two exact 2-vCPU requests. No apply occurred and
+no substitute compute was selected.
 
 ## Architecture
 
