@@ -126,7 +126,7 @@ ACT-2 is closed by the [external checker acceptance evidence](docs/phase2-extern
 
 ### Authoritative monitoring service
 
-The [Phase 4 Azure Function evidence](docs/phase4-azure-function.md) tracks the Python timer-triggered path. A thin Functions adapter calls the existing checker, PostgreSQL incident store, state-row locking, notification queue, and alert delivery behavior. Terraform defines a consumption-based Function, managed-identity-only storage, Key Vault references, and integration with the existing Application Insights resource. Phase 4 remains open until the merged implementation is provisioned and multiple scheduled Azure executions are correlated with persisted check rows and logs.
+ACT-4 is closed by the [Phase 4 Azure Function evidence](docs/phase4-azure-function.md). A thin Python timer adapter calls the existing checker, PostgreSQL incident store, state-row locking, notification queue, and alert delivery behavior. Terraform provisions the Flex Consumption Function, managed-identity-only storage, Key Vault references, and existing Application Insights integration. Three natural Azure timer executions are correlated with three durable PostgreSQL rows and structured logs while the previous Container App scheduler remains safely inactive.
 
 ### CI/CD and infrastructure approval
 
@@ -162,7 +162,6 @@ CI, application deployment, Terraform planning, and operator-approved Terraform 
 
 **Remaining authoritative work**
 
-* Phase 4 live Terraform apply, safe scheduler cutover, and scheduled-run evidence.
 * Phase 9 Kubernetes/deeper-observability implementation after explicit approval.
 
 **Planned**

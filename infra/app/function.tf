@@ -141,6 +141,16 @@ resource "azurerm_function_app_flex_consumption" "monitor" {
     scm_minimum_tls_version                = "1.2"
   }
 
+  # AzureRM 5.6.0 writes a legacy key-based setting with an empty AccountKey
+  # during Flex creation even when shared keys are disabled and the supported
+  # identity-based AzureWebJobsStorage__* settings are configured above. The
+  # empty legacy setting prevents neither identity use nor deployment, but it
+  # is unnecessary and is removed after creation. Ignore only that provider-
+  # generated key so subsequent plans do not restore it.
+  lifecycle {
+    ignore_changes = [app_settings["AzureWebJobsStorage"]]
+  }
+
   tags = local.tags
 
   depends_on = [

@@ -4,9 +4,8 @@ Authoritative rule: a phase is complete only when it is implemented, tested,
 demonstrated, evidenced, and its exact acceptance test passes. Code presence,
 plausible tests, Terraform validation, or a green CI run alone is not a PASS.
 
-Last updated: 2026-10-04 UTC during the Mission 4 audit, based on merged control
-commit `f0176831c0a3686f6b53d6fcb135eb915c2f0960` and the retained live Phase 6
-demonstrations.
+Last updated: 2026-10-04 UTC after the Mission 5 Stage B live Azure Function
+demonstration and final ACT-4 audit.
 
 | Phase | Implementation | Tests | Demonstration | Evidence | Status | Exact blocker |
 |---|---|---|---|---|---|---|
@@ -14,7 +13,7 @@ demonstrations.
 | 1 — Monitored application | Complete | 8 focused endpoint/fault tests and 62 current full-suite tests pass | Normal app plus semantic-health and HTTP-500 faults demonstrated from one Docker image | [ACT-1 application and Docker evidence](phase1-application.md) | **PASS** | None. Both faults are environment-driven; no public fault-control endpoint exists. |
 | 2 — External checker | Complete | 6 focused checker tests, 14 checker/history/runner tests, and 62 full-suite tests pass | Healthy, HTTP failure, semantic invalidity, timeout, connection failure, invalid JSON, and complete result shape demonstrated | [ACT-2 external checker evidence](phase2-external-checker.md) | **PASS** | None. Every success and failure path returns timestamp, classification/status, latency, and applicable error information. |
 | 3 — Azure workload | Complete | Deployment checks exist | Externally reachable Azure deployment established | Existing cloud evidence | **PASS** | None. |
-| 4 — Monitoring service | Python timer adapter and Terraform Flex Consumption resources implemented; Container App remains active pending safe cutover | 10 focused Function/packaging/Terraform tests and 73 full-suite tests pass | Local package and plan demonstrated; live scheduled Azure execution pending | [ACT-4 Azure Function evidence](phase4-azure-function.md) | **OPEN** | Complete the reviewed Terraform apply, safely disable the old scheduler, and prove multiple scheduled executions, persisted rows, and logs in Azure. |
+| 4 — Monitoring service | Python 3.12 timer Function and Terraform Flex Consumption resources complete | 11 focused Function/packaging/Terraform tests and 74 full-suite tests pass | Three natural Azure timer executions correlated with rows `96801`–`96803`; previous scheduler inactive | [ACT-4 Azure Function evidence](phase4-azure-function.md) | **PASS** | None. Terraform, timer, identity, persistence, logging, laptop independence, safe cutover, and duplicate protection are demonstrated. |
 | 5 — Incident lifecycle | Complete | Deterministic PostgreSQL overlap test plus lifecycle/dedup suites pass | Incident #2 lifecycle demonstrated; two overlapping threshold checks serialize to one opening | [Incident #2 report](incidents/incident-002.md) and [concurrency proof](phase5-concurrency.md) | **PASS** | None. The production state-row lock was directly observed blocking the second execution; exactly one incident and one opening-notification row persisted. |
 | 6 — CI/CD and infrastructure automation | Complete | Current suite: 62 passed; 14 focused control tests; 4 verifier tests | Reviewed normal/refresh plans, separate approved state-only apply, live rejection controls, failed-test deployment block, and healthy Deploy #5 demonstrated | [ACT-6 acceptance evidence](ci-cd/phase6-acceptance.md) | **PASS** | None. Approval is an explicitly demonstrated solo-operator manual boundary, not a claimed GitHub required-reviewer environment. |
 | 7 — Observability | Complete for current architecture | Current suite: 62 passed; Phase 8 subset: 8 passed | Incident #2 signals correlated across deployment, checker, App Insights, lifecycle, notification, rollback, and recovery | [Incident #2 timeline](incidents/incident-002.md) and [App Insights evidence](incidents/evidence/incident-002-app-insights.md) | **PASS** | None for ACT-7. Signal limitations and the bounded causal inference are documented. |
@@ -66,13 +65,12 @@ added. The six focused checker tests, fourteen checker/history/runner tests, and
 the full 62-test PostgreSQL-backed suite pass. The exact evidence matrix is in
 `docs/phase2-external-checker.md`, and Phase 2 is now unambiguously **PASS**.
 
-## Mission 5 Stage B implementation status
+## Mission 5 Stage B result
 
-The authoritative Python timer Function adapter and Terraform resources are
-implemented and locally verified. The existing checker, PostgreSQL store,
-locking, lifecycle, notification, and alert paths are reused. The pre-creation
-plan is limited to nine creates with zero updates, replacements, or destroys.
-Phase 4 remains **OPEN** until the implementation is merged, its exact
-main-branch plan is manually approved and applied, the old scheduler is safely
-deactivated, and multiple scheduled Azure executions are correlated with
-persisted check rows and logs.
+The authoritative Python 3.12 timer Function and supporting Flex Consumption
+resources were created from a reviewed Terraform plan through the separate
+manual apply gate. The previous Container App monitor revision is preserved but
+inactive with zero replicas. Three natural one-minute Azure timer executions
+produced three exactly corresponding durable PostgreSQL rows, structured logs,
+no incident or notification increase, and no local execution dependency. All
+eight ACT-4 rows pass, so Phase 4 is **PASS**.
