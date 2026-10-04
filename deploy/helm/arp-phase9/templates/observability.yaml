@@ -48,6 +48,7 @@ spec:
               drop: ["ALL"]
             readOnlyRootFilesystem: true
             runAsNonRoot: true
+            runAsUser: 65534
           volumeMounts:
             - name: config
               mountPath: /etc/prometheus/prometheus.yml
@@ -128,6 +129,7 @@ spec:
               drop: ["ALL"]
             readOnlyRootFilesystem: true
             runAsNonRoot: true
+            runAsUser: 65534
           volumeMounts:
             - name: config
               mountPath: /etc/alertmanager/alertmanager.yml
@@ -213,6 +215,7 @@ spec:
             capabilities:
               drop: ["ALL"]
             runAsNonRoot: true
+            runAsUser: 472
           volumeMounts:
             - name: provisioning
               mountPath: /etc/grafana/provisioning/datasources/datasource.yml
