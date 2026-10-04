@@ -1,0 +1,32 @@
+# Secret-safe evidence excerpt from retained GitHub Actions logs.
+# Source: https://github.com/amir-cs-dev/azure-reliability-platform/actions/runs/35804076293
+# Workflow: Deploy Azure applications
+# Run: 35804076293
+# Deploy job: 107001032834
+# Retrieved: 2026-10-04 UTC
+# Redactions/exclusions: identity identifiers, tokens, and unrelated build noise.
+
+2026-09-23T00:54:38Z run created; event=workflow_dispatch; branch=main
+2026-09-23T00:55:48.2668262Z checked out 5d8e213ed5d08f37d8de362f1e8849bfebd33d81
+2026-09-23T00:56:13.4117595Z built reliability-monitor:5d8e213ed5d08f37d8de362f1e8849bfebd33d81
+2026-09-23T00:56:22.0151037Z pushed reliability-api:5d8e213ed5d08f37d8de362f1e8849bfebd33d81 digest sha256:a02bf75798a377f13dac807166e167f4ca2edb177c58cb841985c20cf911f5ca
+2026-09-23T00:56:26.1221934Z pushed reliability-monitor:5d8e213ed5d08f37d8de362f1e8849bfebd33d81 digest sha256:575b675aab842af4a4b9cbb100b5a5f4f81934a5e9baa7c6ead6f748ba5a07bf
+2026-09-23T00:56:26.1320965Z az containerapp update --resource-group rg-arp-app-wus3 --name ca-arp-api-wus3 --image "$REGISTRY/reliability-api:$GITHUB_SHA" -o none
+2026-09-23T00:56:26.1322185Z az containerapp update --resource-group rg-arp-app-wus3 --name ca-arp-monitor-wus3 --image "$REGISTRY/reliability-monitor:$GITHUB_SHA" -o none
+2026-09-23T00:56:57.9303045Z Verify API and monitor deployment step started
+2026-09-23T00:56:57.9304808Z verifier read configured API and monitor image tags
+2026-09-23T00:56:57.9312282Z verifier entered one-request retry loop
+2026-09-23T00:56:57.9314416Z /health required HTTP success plus JSON status=healthy; /ready required HTTP success
+2026-09-23T00:57:02.8535903Z {"status":"ready"}
+2026-09-23T00:57:02Z Verify API and monitor deployment step conclusion=success
+2026-09-23T00:57:04Z deploy job conclusion=success
+2026-09-23T00:57:05Z workflow conclusion=success
+
+# Interpretation:
+# - The pipeline deployed the exact fault commit and its immutable image tag.
+# - The old verifier exited successfully after the first successful request pair.
+# - /health output is absent because it was piped into the JSON validator;
+#   the printed /ready body and successful shell step establish that both sides
+#   of the conditional passed.
+# - This log does not identify the API revision that served either request and
+#   does not establish 100% target-revision traffic.
