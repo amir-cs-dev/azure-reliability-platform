@@ -126,10 +126,9 @@ resource "azurerm_function_app_flex_consumption" "monitor" {
     AzureWebJobsStorage__credential  = "managedidentity"
     AzureWebJobsStorage__clientId    = azurerm_user_assigned_identity.function.client_id
 
-    FUNCTIONS_WORKER_RUNTIME = "python"
-    MONITOR_SCHEDULE         = var.function_schedule
-    FAILURE_THRESHOLD        = tostring(var.function_failure_threshold)
-    TARGET_URL               = var.monitor_target_url
+    MONITOR_SCHEDULE  = var.function_schedule
+    FAILURE_THRESHOLD = tostring(var.function_failure_threshold)
+    TARGET_URL        = var.monitor_target_url
 
     DATABASE_URL = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.function.name};SecretName=database-url)"
     WEBHOOK_URL  = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.function.name};SecretName=webhook-url)"

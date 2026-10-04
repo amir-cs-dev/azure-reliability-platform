@@ -37,6 +37,12 @@ The implementation uses the supported AzureRM
 resource group, Application Insights instance, Log Analytics workspace,
 external API, and PostgreSQL server.
 
+Flex Consumption declares Python through the resource's first-class
+`runtime_name` and `runtime_version` properties. It rejects the legacy
+`FUNCTIONS_WORKER_RUNTIME` app setting, so that setting is intentionally absent.
+Flex also runs from its managed deployment package by default; the legacy
+`WEBSITE_RUN_FROM_PACKAGE` setting is intentionally absent.
+
 | Terraform address | Purpose |
 |---|---|
 | `azurerm_function_app_flex_consumption.monitor` | Python 3.12 timer Function, maximum one 512-MB instance |
@@ -119,9 +125,9 @@ against production state.
 ## Verification completed before live deployment
 
 ```text
-Function/checker/runner/package slice: 26 passed
+Function/packaging/Terraform slice: 10 passed
 PostgreSQL lifecycle/concurrency slice: 3 passed
-Full suite: 72 passed, 1 existing warning
+Full suite: 73 passed, 1 existing warning
 Terraform fmt/init/validate: passed with AzureRM 5.6.0
 Function source package build: passed
 actionlint 1.7.12: passed
