@@ -18,7 +18,8 @@ def test_ci_has_read_only_permissions_and_terraform_validation():
 
 def test_plan_is_separate_from_apply_and_retains_review_artifact():
     plan = workflow("terraform-plan.yml")
-    assert "pull_request:" in plan
+    assert "pull_request:" not in plan
+    assert "push:\n    branches: [main]" in plan
     assert "needs: validate" in plan
     assert "id-token: write" in plan
     assert "plan_args=(" in plan

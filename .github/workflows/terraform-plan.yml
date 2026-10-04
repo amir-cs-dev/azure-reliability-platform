@@ -1,14 +1,6 @@
 name: Terraform plan
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "infra/app/**"
-      - ".github/workflows/terraform-*.yml"
-      - "scripts/terraform_plan_artifact.py"
-      - "tests/test_terraform_plan_artifact.py"
-      - "tests/test_workflow_controls.py"
   push:
     branches: [main]
     paths:
@@ -55,9 +47,6 @@ jobs:
 
   plan:
     needs: validate
-    if: >-
-      github.event_name != 'pull_request' ||
-      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -85,7 +74,7 @@ jobs:
             }
           done
 
-      - name: Azure login with read-only plan identity
+      - name: Azure login with resource-read plan identity
         uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2
         with:
           client-id: ${{ env.ARM_CLIENT_ID }}
