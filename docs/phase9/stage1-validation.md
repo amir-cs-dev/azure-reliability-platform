@@ -159,3 +159,53 @@ actionlint -color
 
 Results: shell syntax, Python compilation, and actionlint 1.7.12 all passed.
 The deployment, experiment, apply, and teardown scripts were not executed.
+
+## Pull request and trusted-main evidence
+
+[PR #18](https://github.com/amir-cs-dev/azure-reliability-platform/pull/18)
+used implementation commit `131fbcadab753c2a3035d26977ad1e6ae9b49cfe`.
+Its [validation run
+37219575396](https://github.com/amir-cs-dev/azure-reliability-platform/actions/runs/37219575396)
+was green before merge. The PR merged as
+`a15ad3912b723ed986f3329b97f7c1e7c39e0532`.
+
+The [post-merge CI run
+37219716454](https://github.com/amir-cs-dev/azure-reliability-platform/actions/runs/37219716454)
+was green. Its hosted logs record 85 passed tests, 21/21 valid Kubernetes
+resources, two valid Prometheus rules, successful observability validation,
+both Docker builds, and a healthy application container. The existing
+application [Terraform plan run
+37219716656](https://github.com/amir-cs-dev/azure-reliability-platform/actions/runs/37219716656)
+also remained green after the shared plan-control extension.
+
+The isolated [trusted-main Phase 9 plan run
+37219716637](https://github.com/amir-cs-dev/azure-reliability-platform/actions/runs/37219716637)
+completed successfully from merge source
+`a15ad3912b723ed986f3329b97f7c1e7c39e0532`. Retained artifact
+`phase9-terraform-plan-37219716637` has GitHub artifact digest
+`sha256:58fbbb12101240643c981c189c4f72272cc7d0a426cd856e86f9421b1d29658b`
+and expires after its deliberate seven-day review window.
+
+Its metadata records Terraform 1.16.3, operation `normal`, exact `main` ref and
+source SHA, infrastructure tree
+`777853d76588001a5ae29d7036925703a2f37603`, isolated state lineage
+`3fb12007-bf85-15a3-843c-a31a6157b798` serial 1, and:
+
+```text
+create: 3
+read: 0
+update: 0
+replace: 0
+delete: 0
+```
+
+The affected addresses are exactly the cluster and two role assignments listed
+above. The retained binary-plan SHA-256 is
+`06ddc32abde504111ad09f25e0af71082b7a3e10a61800971de1edff1aebeedb`;
+the redacted plan-text SHA-256 is
+`41ddab10520127d5b4c9dcba390858e41d59488f08f6322f9ffc3ce69323309c`.
+
+No apply workflow was dispatched. This evidence-only documentation update
+advances `main`, deliberately making run `37219716637` ineligible for apply
+under the current-main SHA control. After explicit approval and provider/
+identity prerequisites, Stage 2 must generate and review a fresh plan.
