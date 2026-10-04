@@ -11,7 +11,7 @@ if os.environ.get("APPLICATIONINSIGHTS_CONNECTION_STRING"):
         instrumentation_options={"fastapi": {"enabled": True}},
     )
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 
 app = FastAPI(title="Azure Reliability Platform")
 
@@ -43,7 +43,18 @@ def root():
 
 @app.get("/health")
 def health():
-    return {"status": "degraded" if os.environ.get("ARP_PHASE8_FAULT") == "invalid_health" else "healthy"}
+    fault = os.environ.get("ARP_PHASE8_FAULT")
+
+    if fault == "invalid_health":
+        return {"status": "degraded"}
+
+    if fault == "http_500":
+        raise HTTPException(
+            status_code=500,
+            detail="Controlled health failure",
+        )
+
+    return {"status": "healthy"}
 
 
 @app.get("/ready")
