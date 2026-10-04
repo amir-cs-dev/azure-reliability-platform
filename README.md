@@ -124,6 +124,10 @@ The first fault violates the semantic body contract while retaining HTTP success
 
 ACT-2 is closed by the [external checker acceptance evidence](docs/phase2-external-checker.md). The checker distinguishes transport, HTTP, and semantic failures while returning a consistent timestamp/classification/status/latency/error record.
 
+### Authoritative monitoring service
+
+The [Phase 4 Azure Function evidence](docs/phase4-azure-function.md) tracks the Python timer-triggered path. A thin Functions adapter calls the existing checker, PostgreSQL incident store, state-row locking, notification queue, and alert delivery behavior. Terraform defines a consumption-based Function, managed-identity-only storage, Key Vault references, and integration with the existing Application Insights resource. Phase 4 remains open until the merged implementation is provisioned and multiple scheduled Azure executions are correlated with persisted check rows and logs.
+
 ### CI/CD and infrastructure approval
 
 ACT-6 is closed by the [Phase 6 CI/CD acceptance evidence](docs/ci-cd/phase6-acceptance.md). Pull requests receive full validation, while trusted `main` produces a retained Terraform plan. Infrastructure apply is a separate manual workflow that requires the reviewed plan run ID and literal `APPLY`, verifies the exact source/configuration/state/artifact, and uses an apply-only OIDC identity. A safe refresh-only apply and live rejection/failing-test experiments demonstrate the controls without creating a production revision or outage.
@@ -156,9 +160,9 @@ CI, application deployment, Terraform planning, and operator-approved Terraform 
 * GitHub PR validation and Azure application deployment through OIDC.
 * Remote-state Terraform plan review and operator-approved exact-plan apply.
 
-**Remaining authoritative work (not started by Mission 4)**
+**Remaining authoritative work**
 
-* Phase 4 authoritative Azure Function architecture.
+* Phase 4 live Terraform apply, safe scheduler cutover, and scheduled-run evidence.
 * Phase 9 Kubernetes/deeper-observability implementation after explicit approval.
 
 **Planned**

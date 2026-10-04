@@ -38,6 +38,7 @@ env:
   ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_TERRAFORM_SUBSCRIPTION_ID }}
   TF_STATE_RESOURCE_GROUP: ${{ vars.TF_STATE_RESOURCE_GROUP }}
   TF_STATE_STORAGE_ACCOUNT: ${{ vars.TF_STATE_STORAGE_ACCOUNT }}
+  KEY_VAULT_OPERATOR_OBJECT_ID: ${{ vars.KEY_VAULT_OPERATOR_OBJECT_ID }}
 
 jobs:
   validate:
@@ -67,7 +68,8 @@ jobs:
           set -euo pipefail
           for name in \
             ARM_CLIENT_ID ARM_TENANT_ID ARM_SUBSCRIPTION_ID \
-            TF_STATE_RESOURCE_GROUP TF_STATE_STORAGE_ACCOUNT; do
+            TF_STATE_RESOURCE_GROUP TF_STATE_STORAGE_ACCOUNT \
+            KEY_VAULT_OPERATOR_OBJECT_ID; do
             test -n "${!name:-}" || {
               echo "Missing required repository variable: $name" >&2
               exit 1
@@ -94,6 +96,13 @@ jobs:
           tag=${image##*:}
           test -n "$tag"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          fqdn=$(az containerapp show \
+            --resource-group rg-arp-app-wus3 \
+            --name ca-arp-api-wus3 \
+            --query 'properties.configuration.ingress.fqdn' \
+            --output tsv)
+          test -n "$fqdn"
+          echo "target_url=https://$fqdn/health" >> "$GITHUB_OUTPUT"
 
       - name: Terraform format, initialize remote state, and validate
         shell: bash
@@ -111,6 +120,8 @@ jobs:
         env:
           TF_VAR_subscription_id: ${{ env.ARM_SUBSCRIPTION_ID }}
           TF_VAR_image_tag: ${{ steps.image.outputs.tag }}
+          TF_VAR_monitor_target_url: ${{ steps.image.outputs.target_url }}
+          TF_VAR_key_vault_operator_object_id: ${{ env.KEY_VAULT_OPERATOR_OBJECT_ID }}
           BUNDLE_DIR: ${{ runner.temp }}/terraform-plan
         run: |
           set -euo pipefail

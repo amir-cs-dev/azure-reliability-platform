@@ -51,6 +51,37 @@ def dispatch_alerts(store, webhook_url):
         return None
 
 
+def run_monitor_once(
+    store,
+    threshold=2,
+    target_url=None,
+    webhook_url=None,
+):
+    """Run one check through the shared persistence and alert path."""
+
+    if threshold < 1:
+        raise ValueError("threshold must be at least 1")
+
+    if target_url is None:
+        result = check_health()
+    else:
+        result = check_health(target_url)
+
+    state, event = store.record(
+        result,
+        threshold,
+    )
+
+    delivery = dispatch_alerts(store, webhook_url)
+
+    return {
+        "result": result,
+        "state": state,
+        "event": event,
+        "delivery": delivery,
+    }
+
+
 def run_monitor(
     interval=10,
     threshold=2,
@@ -113,13 +144,15 @@ def run_monitor(
 
     try:
         while count is None or checks < count:
-
-            result = check_health()
-
-            state, event = store.record(
-                result,
-                threshold,
+            cycle = run_monitor_once(
+                store=store,
+                threshold=threshold,
+                webhook_url=webhook_url,
             )
+
+            result = cycle["result"]
+            state = cycle["state"]
+            event = cycle["event"]
 
             checks += 1
 
@@ -136,9 +169,6 @@ def run_monitor(
                     f"EVENT: {event}",
                     flush=True,
                 )
-
-            # Dispatch newly queued and previously failed alerts.
-            dispatch_alerts(store, webhook_url)
 
             if count is None or checks < count:
                 time.sleep(interval)
