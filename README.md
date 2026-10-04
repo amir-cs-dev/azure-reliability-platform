@@ -70,7 +70,7 @@ The test suite exercises application health checks, monitoring behavior, inciden
 
 Additional tests cover invalid state transitions, restart behavior, duplicate prevention, and transaction rollback.
 
-The 2026-10-04 Mission 3 audit completed with **48 passing tests**, including the PostgreSQL integration tests against a disposable local `arp_test` database. The focused application endpoint and controlled-fault suite completed with **8 passing tests**.
+The 2026-10-04 Mission 4 audit completed with **62 passing tests**, including the PostgreSQL integration tests against a disposable local `arp_test` database. The focused application endpoint and controlled-fault suite completed with **8 passing tests**; the Terraform artifact/workflow control suite completed with **14 passing tests**.
 
 ## Containerization
 
@@ -122,6 +122,10 @@ ACT-1 is closed by the [Phase 1 application and Docker evidence](docs/phase1-app
 
 The first fault violates the semantic body contract while retaining HTTP success; the second is a distinct HTTP status failure. Normal production behavior remains the default when the variable is unset.
 
+### CI/CD and infrastructure approval
+
+ACT-6 is closed by the [Phase 6 CI/CD acceptance evidence](docs/ci-cd/phase6-acceptance.md). Pull requests receive full validation, while trusted `main` produces a retained Terraform plan. Infrastructure apply is a separate manual workflow that requires the reviewed plan run ID and literal `APPLY`, verifies the exact source/configuration/state/artifact, and uses an apply-only OIDC identity. A safe refresh-only apply and live rejection/failing-test experiments demonstrate the controls without creating a production revision or outage.
+
 ## Technology Stack
 
 | Component              | Technology                 |
@@ -136,7 +140,7 @@ The first fault violates the semantic body contract while retaining HTTP success
 | Infrastructure as code | Terraform                  |
 | Cloud platform         | Microsoft Azure            |
 
-CI configuration has been added to the repository. Successful execution on GitHub and Azure deployment remain separate verification milestones.
+CI, application deployment, Terraform planning, and operator-approved Terraform apply are separate workflows with explicit least-privilege permissions.
 
 ## Deployment Roadmap
 
@@ -147,13 +151,13 @@ CI configuration has been added to the repository. Successful execution on GitHu
 * Persistent incident management.
 * Automatic webhook delivery and recovery.
 * Local Docker build and health verification.
+* GitHub PR validation and Azure application deployment through OIDC.
+* Remote-state Terraform plan review and operator-approved exact-plan apply.
 
-**In progress**
+**Remaining authoritative work (not started by Mission 4)**
 
-* GitHub Actions pipeline verification.
-* Terraform infrastructure configuration.
-* Azure application deployment.
-* Secure deployment authentication.
+* Phase 4 authoritative Azure Function architecture.
+* Phase 9 Kubernetes/deeper-observability implementation after explicit approval.
 
 **Planned**
 

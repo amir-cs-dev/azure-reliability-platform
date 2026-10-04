@@ -1,6 +1,11 @@
-# Phase 6 and Phase 7 implementation / verification
+# Historical Phase 6 and Phase 7 implementation notes
 
-Authoritative source: September 21 roadmap. These are implementation files, NOT completed Azure acceptance evidence.
+Authoritative source: September 21 roadmap. This file preserves the early
+implementation audit. Current acceptance evidence supersedes its original
+pending conclusions:
+
+- [Phase 6 CI/CD acceptance evidence](ci-cd/phase6-acceptance.md)
+- [Phase 7 Incident #2 evidence](incidents/incident-002.md)
 
 ## Audit findings from uploaded source
 
@@ -19,18 +24,26 @@ Unzip overlay into a review directory. From your project root run `python /path/
 1. `python -m pip install -r requirements.txt 'psycopg[binary]>=3.2,<4' pytest requests httpx`
 2. Use ONLY disposable PostgreSQL database `arp_test` for `PG_TEST_DATABASE_URL`; the integration fixture truncates test tables and refuses other database names.
 3. `python -m pytest -q` with `PG_TEST_DATABASE_URL` set; run `terraform fmt -check -recursive infra/app`, `terraform -chdir=infra/app init -backend=false`, `terraform -chdir=infra/app validate`.
-4. On GitHub protect `production` environment with required reviewer and main-only deployment branch. Configure federated Azure identity subject for exact GitHub environment, assign scoped `AcrPush` on the existing registry plus permission to update ONLY target Container Apps (custom role), and set environment variables `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`. Do not add Azure client secrets. GitHub OIDC subject formats can differ for repositories created after July 15, 2026: inspect GitHub's current OIDC guidance and use exact subject claim.
-5. Push CI changes to a pull request; confirm full green CI. After protected environment/identity setup merge to main; run `Deploy Azure applications` manual dispatch; approve production; verify immutable images, health, logs and monitor PostgreSQL connection.
+4. Audit the live `production` environment, its main-only branch policy, OIDC
+   variables, and the exact Azure role scopes. Do not infer reviewer protection
+   from an `environment:` YAML line.
+5. For infrastructure, use the separate trusted-main plan artifact and
+   operator-dispatched exact-plan apply controls documented in the current
+   Phase 6 report. Do not add Azure client secrets.
 6. Before applying `infra/app/observability.tf` to Azure, initialize against EXISTING backend, inspect `terraform state list`, `terraform plan -var='subscription_id=...' -var='image_tag=<existing-image-tag>'` and review costs/diffs. Do not apply if Terraform proposes replacement of live state or deletion. The monitor, database, and app deployment should eventually be reconciled under Terraform instead of CLI-driven drift.
 7. After reviewed Terraform apply provisions Application Insights/Workbook, deploy the instrumented app SHA and confirm `APPLICATIONINSIGHTS_CONNECTION_STRING` is present on live container (do not print full value). Open Workbook and verify real data for monitor checks, incidents, AppRequests, AppExceptions, and deployment revisions. Azure Monitor logs may take time to ingest.
 
-## Phase 6 original exit criteria not yet demonstrated
+## Phase 6 current status
 
-PR tests and Terraform validate pass; failed tests block deploy; GitHub OIDC works; approved main image reaches Azure and health verifies. Additionally original requirement demands Terraform remote state, reviewed plan and approved infrastructure deployment: current app-only workflow is NOT enough; reconcile Terraform ownership first.
+**PASS.** PR validation, separate deployment, OIDC, remote state, controlled
+plan/review, explicit operator approval, permissions/environment audits,
+immutable deployment, failed-test blocking, healthy post-cutover verification,
+and negative verifier regressions are demonstrated in the current evidence.
 
-## Phase 7 original exit criteria not yet demonstrated
+## Phase 7 current status
 
-An operator can correlate checker sample timestamp, monitor event and app revision, request rate/error/latency, exceptions, and recovery in an actual populated workbook. Need screenshots and a controlled outage to verify; empty workbook != completion.
+**PASS.** The populated Incident #2 correlation and its bounded limitations are
+recorded in the current incident evidence package.
 
 ## Notes
 
