@@ -6,6 +6,8 @@ A reliability engineering project built around a Python application and an indep
 
 The platform is being extended with containerized deployment, infrastructure as code, and automated delivery on Microsoft Azure.
 
+See the evidence-gated [phase acceptance status](docs/acceptance-status.md) for the current implementation, test, demonstration, and blocker state. A phase is not considered complete merely because its code exists.
+
 ## Architecture
 
 ```text
@@ -68,7 +70,7 @@ The test suite exercises application health checks, monitoring behavior, inciden
 
 Additional tests cover invalid state transitions, restart behavior, duplicate prevention, and transaction rollback.
 
-The latest verified local test run completed with **34 passing tests**.
+The 2026-10-04 Mission 1 audit completed with **45 passing tests**, including the PostgreSQL integration tests against a disposable local `arp_test` database. The focused controlled-fault and deployment-verifier subset completed with **6 passing tests**.
 
 ## Containerization
 
@@ -100,13 +102,19 @@ A live failure-and-recovery exercise confirmed successful delivery of both the i
 
 Final database inspection verified that both notifications had a delivered status and no notifications remained pending.
 
+### Incident #2 evidence
+
+The controlled semantic-health failure, detection, Discord notification delivery, operator rollback, persisted recovery, and verifier remediation are documented in the reviewer-facing [Incident #2 report](docs/incidents/incident-002.md).
+
+The report includes the complete ACT-7 timeline, ACT-8 rollback audit, exact deployment and revision references, Application Insights results, real notification timings, telemetry limitations, and the bounded—not overstated—revision-cutover diagnosis. Phase 7 and Phase 8 are PASS; other phases retain their explicit blockers in the acceptance-status table.
+
 ## Technology Stack
 
 | Component              | Technology                 |
 | ---------------------- | -------------------------- |
 | Application            | Python, FastAPI            |
 | Monitoring             | Python, HTTP health checks |
-| Persistence            | SQLite                     |
+| Persistence            | SQLite, PostgreSQL         |
 | Testing                | pytest                     |
 | Containerization       | Docker                     |
 | Source control         | Git, GitHub                |
