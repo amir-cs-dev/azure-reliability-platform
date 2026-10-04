@@ -1,0 +1,203 @@
+name: Terraform plan
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "infra/app/**"
+      - ".github/workflows/terraform-*.yml"
+      - "scripts/terraform_plan_artifact.py"
+      - "tests/test_terraform_plan_artifact.py"
+      - "tests/test_workflow_controls.py"
+  push:
+    branches: [main]
+    paths:
+      - "infra/app/**"
+      - ".github/workflows/terraform-*.yml"
+      - "scripts/terraform_plan_artifact.py"
+      - "tests/test_terraform_plan_artifact.py"
+      - "tests/test_workflow_controls.py"
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Plan mode; refresh-only is for safe state reconciliation evidence.
+        required: true
+        default: normal
+        type: choice
+        options:
+          - normal
+          - refresh-only
+
+permissions: {}
+
+concurrency:
+  group: terraform-plan-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "0"
+  TF_VERSION: "1.16.3"
+  INFRA_DIR: infra/app
+  PLAN_OPERATION: ${{ github.event_name == 'workflow_dispatch' && inputs.operation || 'normal' }}
+  ARM_USE_OIDC: "true"
+  ARM_CLIENT_ID: ${{ vars.AZURE_TERRAFORM_PLAN_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ vars.AZURE_TERRAFORM_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_TERRAFORM_SUBSCRIPTION_ID }}
+  TF_STATE_RESOURCE_GROUP: ${{ vars.TF_STATE_RESOURCE_GROUP }}
+  TF_STATE_STORAGE_ACCOUNT: ${{ vars.TF_STATE_STORAGE_ACCOUNT }}
+
+jobs:
+  validate:
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
+  plan:
+    needs: validate
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Require non-secret workflow configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in \
+            ARM_CLIENT_ID ARM_TENANT_ID ARM_SUBSCRIPTION_ID \
+            TF_STATE_RESOURCE_GROUP TF_STATE_STORAGE_ACCOUNT; do
+            test -n "${!name:-}" || {
+              echo "Missing required repository variable: $name" >&2
+              exit 1
+            }
+          done
+
+      - name: Azure login with read-only plan identity
+        uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2
+        with:
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+
+      - name: Resolve existing immutable application tag
+        id: image
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=$(az containerapp show \
+            --resource-group rg-arp-app-wus3 \
+            --name ca-arp-api-wus3 \
+            --query 'properties.template.containers[0].image' \
+            --output tsv)
+          tag=${image##*:}
+          test -n "$tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Terraform format, initialize remote state, and validate
+        shell: bash
+        run: |
+          set -euo pipefail
+          terraform fmt -check -recursive "$INFRA_DIR"
+          terraform -chdir="$INFRA_DIR" init -input=false \
+            -backend-config="resource_group_name=$TF_STATE_RESOURCE_GROUP" \
+            -backend-config="storage_account_name=$TF_STATE_STORAGE_ACCOUNT"
+          terraform -chdir="$INFRA_DIR" validate
+
+      - name: Generate saved plan and review files
+        id: plan
+        shell: bash
+        env:
+          TF_VAR_subscription_id: ${{ env.ARM_SUBSCRIPTION_ID }}
+          TF_VAR_image_tag: ${{ steps.image.outputs.tag }}
+          BUNDLE_DIR: ${{ runner.temp }}/terraform-plan
+        run: |
+          set -euo pipefail
+          mkdir -p "$BUNDLE_DIR"
+          terraform -chdir="$INFRA_DIR" state pull > "$RUNNER_TEMP/state-before.json"
+
+          plan_args=(
+            plan
+            -input=false
+            -lock-timeout=60s
+            -detailed-exitcode
+            -out="$BUNDLE_DIR/plan.tfplan"
+          )
+          if [[ "$PLAN_OPERATION" == "refresh-only" ]]; then
+            plan_args+=( -refresh-only )
+          fi
+
+          set +e
+          terraform -chdir="$INFRA_DIR" "${plan_args[@]}"
+          plan_exit_code=$?
+          set -e
+          if [[ "$plan_exit_code" != 0 && "$plan_exit_code" != 2 ]]; then
+            exit "$plan_exit_code"
+          fi
+
+          terraform -chdir="$INFRA_DIR" show -no-color \
+            "$BUNDLE_DIR/plan.tfplan" > "$BUNDLE_DIR/plan.txt"
+          terraform -chdir="$INFRA_DIR" show -json \
+            "$BUNDLE_DIR/plan.tfplan" > "$RUNNER_TEMP/plan.json"
+
+          terraform_version=$(terraform version -json | jq -r .terraform_version)
+          infra_tree=$(git rev-parse "$GITHUB_SHA:$INFRA_DIR")
+          python scripts/terraform_plan_artifact.py create \
+            --bundle-dir "$BUNDLE_DIR" \
+            --plan-json "$RUNNER_TEMP/plan.json" \
+            --state "$RUNNER_TEMP/state-before.json" \
+            --operation "$PLAN_OPERATION" \
+            --plan-exit-code "$plan_exit_code" \
+            --repository "$GITHUB_REPOSITORY" \
+            --source-sha "$GITHUB_SHA" \
+            --source-ref "$GITHUB_REF" \
+            --source-branch "$GITHUB_REF_NAME" \
+            --event-name "$GITHUB_EVENT_NAME" \
+            --run-id "$GITHUB_RUN_ID" \
+            --run-attempt "$GITHUB_RUN_ATTEMPT" \
+            --workflow-ref "$GITHUB_WORKFLOW_REF" \
+            --terraform-version "$terraform_version" \
+            --infra-tree "$infra_tree" \
+            --image-tag "$TF_VAR_image_tag" \
+            --state-resource-group "$TF_STATE_RESOURCE_GROUP" \
+            --state-storage-account "$TF_STATE_STORAGE_ACCOUNT" \
+            --output "$BUNDLE_DIR/metadata.json"
+
+      - name: Publish human-readable plan summary
+        shell: bash
+        env:
+          BUNDLE_DIR: ${{ runner.temp }}/terraform-plan
+        run: |
+          set -euo pipefail
+          {
+            echo "## Terraform plan evidence"
+            echo
+            echo "- Source SHA: \`$GITHUB_SHA\`"
+            echo "- Operation: \`$PLAN_OPERATION\`"
+            echo "- Artifact: \`terraform-plan-$GITHUB_RUN_ID\`"
+            echo "- Apply eligibility: only a successful main-branch plan is eligible"
+            echo
+            echo '```json'
+            jq '.plan.summary' "$BUNDLE_DIR/metadata.json"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Retain exact plan and metadata for review
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: terraform-plan-${{ github.run_id }}
+          path: ${{ runner.temp }}/terraform-plan/
+          if-no-files-found: error
+          retention-days: 7
