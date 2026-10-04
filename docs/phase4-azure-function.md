@@ -121,6 +121,21 @@ It completed successfully at `2026-10-04T06:01:42Z`; post-apply state serial was
 `terraform-apply-37181505842` has digest
 `sha256:ddf81ea66ac27288be66c4c7bcfb7daaff85066b08e16105d1f61d6cd41234ba`.
 
+After the evidence merge, the trusted-main plan's first attempt correctly
+failed closed because its read-only OIDC identity lacked Azure's non-`read`
+`Microsoft.Web/sites/config/list/action` permission for the newly created
+Function. The custom `ARP Terraform Function Plan Reader` role grants only that
+action and is assigned only at
+`func-arp-monitor-3e6c8737-wus3`; it adds no write or data-plane permission.
+Attempt 2 of [run
+37214492285](https://github.com/amir-cs-dev/azure-reliability-platform/actions/runs/37214492285)
+then completed from merged source
+`4cc44b8ee597586f531962329d442cfa38e0b033`, Terraform 1.16.3, and state
+lineage `cf7dcbb6-a5c0-de04-d87e-14665ab91030` serial 15. The retained plan has
+zero creates, reads, updates, replacements, or deletes. Artifact
+`terraform-plan-37214492285` has digest
+`sha256:ce467a69cb798d8da9e7ae60dca12a5c92a5376daf4cbc6a3066bf18ea80ed8c`.
+
 The Function source package was then remotely built and deployed from
 `2026-10-04T06:04:52Z` through `06:06:01Z`. Azure subsequently listed the
 `scheduled_monitor` timer function from the deployed package.
@@ -212,7 +227,12 @@ Implementation was integrated through [PR
 `c91de7acb351d3881da9a508dfaac09f6b5462fe`; the modern Flex runtime correction
 was integrated through [PR
 #15](https://github.com/amir-cs-dev/azure-reliability-platform/pull/15) at merge
-`1b4b1f5839adf09efb6000c272b9881c7133efcb`.
+`1b4b1f5839adf09efb6000c272b9881c7133efcb`. The live acceptance evidence and
+provider-workaround guard were integrated through [PR
+#16](https://github.com/amir-cs-dev/azure-reliability-platform/pull/16) at merge
+`4cc44b8ee597586f531962329d442cfa38e0b033`; its [post-merge CI run
+37214492100](https://github.com/amir-cs-dev/azure-reliability-platform/actions/runs/37214492100)
+is green.
 
 ## ACT-4 matrix
 
