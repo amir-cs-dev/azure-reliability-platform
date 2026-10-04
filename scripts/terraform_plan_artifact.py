@@ -13,7 +13,7 @@ from pathlib import Path
 
 
 SCHEMA_VERSION = 1
-ALLOWED_OPERATIONS = {"normal", "refresh-only"}
+ALLOWED_OPERATIONS = {"destroy", "normal", "refresh-only"}
 ALLOWED_APPLY_EVENTS = {"push", "workflow_dispatch"}
 REQUIRED_PLAN_FILES = ("plan.tfplan", "plan.txt")
 MAIN_REF = "refs/heads/main"
@@ -93,6 +93,8 @@ def create_metadata(
     state_resource_group: str,
     state_storage_account: str,
     created_at: datetime | None = None,
+    state_key: str = "application.terraform.tfstate",
+    artifact_prefix: str = "terraform-plan",
 ) -> dict[str, object]:
     if operation not in ALLOWED_OPERATIONS:
         raise ControlError(f"Unsupported plan operation: {operation}")
@@ -112,7 +114,7 @@ def create_metadata(
     plan_json = json.loads(plan_json_path.read_text())
     metadata = {
         "schema_version": SCHEMA_VERSION,
-        "artifact_name": f"terraform-plan-{run_id}",
+        "artifact_name": f"{artifact_prefix}-{run_id}",
         "repository": repository,
         "source": {
             "sha": source_sha,
@@ -136,7 +138,7 @@ def create_metadata(
             "resource_group": state_resource_group,
             "storage_account": state_storage_account,
             "container": "tfstate",
-            "key": "application.terraform.tfstate",
+            "key": state_key,
             **_state_identity(state_path),
         },
         "variables": {"image_tag": image_tag},
@@ -162,6 +164,9 @@ def validate_metadata(
     expected_infra_tree: str,
     max_age_seconds: int,
     now: datetime | None = None,
+    expected_state_key: str = "application.terraform.tfstate",
+    expected_artifact_prefix: str = "terraform-plan",
+    expected_workflow_file: str = "terraform-plan.yml",
 ) -> dict[str, object]:
     metadata = json.loads(metadata_path.read_text())
     errors = []
@@ -173,7 +178,8 @@ def validate_metadata(
     require(metadata.get("schema_version") == SCHEMA_VERSION, "schema mismatch")
     require(metadata.get("repository") == expected_repository, "repository mismatch")
     require(
-        metadata.get("artifact_name") == f"terraform-plan-{expected_run_id}",
+        metadata.get("artifact_name")
+        == f"{expected_artifact_prefix}-{expected_run_id}",
         "artifact name does not match the requested run",
     )
 
@@ -188,7 +194,8 @@ def validate_metadata(
     workflow = metadata.get("workflow", {})
     require(str(workflow.get("run_id")) == str(expected_run_id), "plan run ID mismatch")
     expected_workflow_ref = (
-        f"{expected_repository}/.github/workflows/terraform-plan.yml@{MAIN_REF}"
+        f"{expected_repository}/.github/workflows/"
+        f"{expected_workflow_file}@{MAIN_REF}"
     )
     require(workflow.get("workflow_ref") == expected_workflow_ref, "unexpected plan workflow ref")
 
@@ -213,7 +220,7 @@ def validate_metadata(
         require(backend.get("type") == "azurerm", "unexpected backend type")
         require(backend.get("container") == "tfstate", "unexpected state container")
         require(
-            backend.get("key") == "application.terraform.tfstate",
+            backend.get("key") == expected_state_key,
             "unexpected state key",
         )
         require(backend.get("lineage") == current_state["lineage"], "state lineage changed")
@@ -268,6 +275,8 @@ def _create_command(args: argparse.Namespace) -> None:
         image_tag=args.image_tag,
         state_resource_group=args.state_resource_group,
         state_storage_account=args.state_storage_account,
+        state_key=args.state_key,
+        artifact_prefix=args.artifact_prefix,
     )
     args.output.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n")
 
@@ -284,6 +293,9 @@ def _validate_command(args: argparse.Namespace) -> None:
         expected_terraform_version=args.terraform_version,
         expected_infra_tree=args.infra_tree,
         max_age_seconds=args.max_age_seconds,
+        expected_state_key=args.state_key,
+        expected_artifact_prefix=args.artifact_prefix,
+        expected_workflow_file=args.workflow_file,
     )
     summary = metadata["plan"]["summary"]["counts"]
     print(
@@ -315,6 +327,11 @@ def _parser() -> argparse.ArgumentParser:
     create.add_argument("--image-tag", required=True)
     create.add_argument("--state-resource-group", required=True)
     create.add_argument("--state-storage-account", required=True)
+    create.add_argument(
+        "--state-key",
+        default="application.terraform.tfstate",
+    )
+    create.add_argument("--artifact-prefix", default="terraform-plan")
     create.add_argument("--output", type=Path, required=True)
     create.set_defaults(func=_create_command)
 
@@ -329,6 +346,12 @@ def _parser() -> argparse.ArgumentParser:
     validate.add_argument("--terraform-version", required=True)
     validate.add_argument("--infra-tree", required=True)
     validate.add_argument("--max-age-seconds", type=int, default=86400)
+    validate.add_argument(
+        "--state-key",
+        default="application.terraform.tfstate",
+    )
+    validate.add_argument("--artifact-prefix", default="terraform-plan")
+    validate.add_argument("--workflow-file", default="terraform-plan.yml")
     validate.set_defaults(func=_validate_command)
     return parser
 

@@ -1,0 +1,65 @@
+replicaCount: 2
+
+image:
+  repository: arp3e6c8737fb3a44be8477.azurecr.io/reliability-api
+  digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+  pullPolicy: IfNotPresent
+
+deployment:
+  revision: stage1-render-only
+  faultMode: ""
+
+service:
+  type: LoadBalancer
+  port: 80
+
+application:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+prometheus:
+  image: prom/prometheus:v3.7.3
+  resources:
+    requests:
+      cpu: 200m
+      memory: 384Mi
+    limits:
+      cpu: 500m
+      memory: 768Mi
+
+alertmanager:
+  image: prom/alertmanager:v0.29.0
+  webhookSecretName: arp-alertmanager-webhook
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+grafana:
+  image: grafana/grafana:12.3.0
+  adminSecretName: arp-grafana-admin
+  resources:
+    requests:
+      cpu: 100m
+      memory: 192Mi
+    limits:
+      cpu: 300m
+      memory: 384Mi
+
+kubeStateMetrics:
+  image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.17.0
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi

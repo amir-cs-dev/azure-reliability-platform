@@ -140,3 +140,67 @@ def test_non_main_plan_cannot_be_applied(tmp_path):
 
     with pytest.raises(artifact.ControlError, match="not refs/heads/main"):
         validate(bundle, plan_json, state, metadata_path)
+
+
+def test_phase9_destroy_plan_uses_isolated_identity(tmp_path):
+    bundle = tmp_path / "bundle"
+    bundle.mkdir()
+    (bundle / "plan.tfplan").write_bytes(b"phase9-binary-plan")
+    (bundle / "plan.txt").write_text("Terraform will destroy the AKS lab.\n")
+    plan_json = tmp_path / "plan.json"
+    plan_json.write_text(json.dumps({
+        "terraform_version": VERSION,
+        "resource_changes": [{
+            "address": "azurerm_kubernetes_cluster.phase9",
+            "change": {"actions": ["delete"]},
+        }],
+    }))
+    state = tmp_path / "state.json"
+    state.write_text(json.dumps({"lineage": "phase9-lineage", "serial": 3}))
+
+    metadata = artifact.create_metadata(
+        bundle_dir=bundle,
+        plan_json_path=plan_json,
+        state_path=state,
+        operation="destroy",
+        plan_exit_code=2,
+        repository=REPOSITORY,
+        source_sha=SHA,
+        source_ref="refs/heads/main",
+        source_branch="main",
+        event_name="workflow_dispatch",
+        run_id=RUN_ID,
+        run_attempt="1",
+        workflow_ref=(
+            f"{REPOSITORY}/.github/workflows/"
+            "phase9-terraform-plan.yml@refs/heads/main"
+        ),
+        terraform_version=VERSION,
+        infra_tree=TREE,
+        image_tag=SHA,
+        state_resource_group="state-rg",
+        state_storage_account="stateaccount",
+        state_key="phase9.terraform.tfstate",
+        artifact_prefix="phase9-terraform-plan",
+    )
+    metadata_path = bundle / "metadata.json"
+    metadata_path.write_text(json.dumps(metadata))
+
+    accepted = artifact.validate_metadata(
+        bundle_dir=bundle,
+        plan_json_path=plan_json,
+        metadata_path=metadata_path,
+        current_state_path=state,
+        expected_repository=REPOSITORY,
+        expected_run_id=RUN_ID,
+        expected_main_sha=SHA,
+        expected_terraform_version=VERSION,
+        expected_infra_tree=TREE,
+        max_age_seconds=86400,
+        expected_state_key="phase9.terraform.tfstate",
+        expected_artifact_prefix="phase9-terraform-plan",
+        expected_workflow_file="phase9-terraform-plan.yml",
+    )
+
+    assert accepted["terraform"]["operation"] == "destroy"
+    assert accepted["plan"]["summary"]["counts"]["delete"] == 1

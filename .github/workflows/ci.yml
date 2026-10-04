@@ -54,11 +54,22 @@ jobs:
         with:
           terraform_version: "1.16.3"
 
+      - name: Set up Helm
+        uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4.3.1
+        with:
+          version: v3.19.0
+
       - name: Validate Terraform without accessing remote state
         run: |
           terraform fmt -check -recursive infra/app
           terraform -chdir=infra/app init -backend=false -input=false
           terraform -chdir=infra/app validate
+          terraform fmt -check -recursive infra/phase9
+          terraform -chdir=infra/phase9 init -backend=false -input=false
+          terraform -chdir=infra/phase9 validate
+
+      - name: Validate Phase 9 Helm and observability assets
+        run: scripts/phase9/validate.sh
 
       - name: Build Azure Function source package
         run: |
