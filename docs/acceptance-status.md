@@ -4,8 +4,8 @@ Authoritative rule: a phase is complete only when it is implemented, tested,
 demonstrated, evidenced, and its exact acceptance test passes. Code presence,
 plausible tests, Terraform validation, or a green CI run alone is not a PASS.
 
-Last updated: 2026-10-04 UTC after Mission 6 Stage 1 repository implementation,
-static validation, Terraform planning, and the mandatory pre-AKS cost gate.
+Last updated: 2026-10-04 UTC after Mission 6 Stage 2 approval, provider and
+identity preflight, fresh Terraform planning, and the Azure quota rejection.
 
 | Phase | Implementation | Tests | Demonstration | Evidence | Status | Exact blocker |
 |---|---|---|---|---|---|---|
@@ -18,7 +18,7 @@ static validation, Terraform planning, and the mandatory pre-AKS cost gate.
 | 6 — CI/CD and infrastructure automation | Complete | Current suite: 62 passed; 14 focused control tests; 4 verifier tests | Reviewed normal/refresh plans, separate approved state-only apply, live rejection controls, failed-test deployment block, and healthy Deploy #5 demonstrated | [ACT-6 acceptance evidence](ci-cd/phase6-acceptance.md) | **PASS** | None. Approval is an explicitly demonstrated solo-operator manual boundary, not a claimed GitHub required-reviewer environment. |
 | 7 — Observability | Complete for current architecture | Current suite: 62 passed; Phase 8 subset: 8 passed | Incident #2 signals correlated across deployment, checker, App Insights, lifecycle, notification, rollback, and recovery | [Incident #2 timeline](incidents/incident-002.md) and [App Insights evidence](incidents/evidence/incident-002-app-insights.md) | **PASS** | None for ACT-7. Signal limitations and the bounded causal inference are documented. |
 | 8 — Recovery and rollback | Complete | Current suite: 62 passed; verifier/fault subset: 8 passed | Broken revision detected; operator rollback recovered; fixed verifier deployed and passed six samples | [Incident #2 report](incidents/incident-002.md), [Azure logs/database evidence](incidents/evidence/incident-002-azure-logs.md), and [Deploy #4 excerpt](incidents/evidence/incident-002-deploy4.log) | **PASS** | None for ACT-8. The exact early-request revision remains unknowable and is correctly labeled as a limitation, not a fabricated fact. |
-| 9 — Kubernetes / deeper observability | Stage 1 complete: isolated AKS Terraform, Helm, application metrics, Prometheus, Grafana, Alertmanager, experiment, workflows, and teardown tooling | 25 focused tests and 85-test PostgreSQL-backed full suite pass; Terraform/Helm/Kubernetes/Prometheus/Alertmanager/Grafana/actionlint/Docker checks pass | Not run; no AKS apply was authorized | [Stage 1 design](phase9/README.md), [resource/cost gate](phase9/cost-gate.md), [Stage 2 runbook](phase9/runbook.md); live evidence intentionally empty | **OPEN — AWAITING EXPLICIT PROVISIONING APPROVAL** | Approve the resource/cost gate, then provide live evidence for all 14 ACT-9 rows and prove teardown. |
+| 9 — Kubernetes / deeper observability | Stage 1 complete; exact envelope approved; providers, secretless apply identity, and fresh plan complete | 25 focused tests and 85-test PostgreSQL-backed full suite pass; all static/CI checks pass | Not run; no AKS apply occurred | [Stage 1 design](phase9/README.md), [cost gate](phase9/cost-gate.md), [Stage 2 preflight](phase9/stage2-preflight.md), and [runbook](phase9/runbook.md); live evidence intentionally empty | **OPEN — PROVISIONING BLOCKED** | West US 3 DASv5-family quota is 0; two exact 2-vCPU requests failed with `QuotaNotAvailableForResource`. Obtain quota or separately approve a changed plan. |
 | 10 — Portfolio publication | Open | Final audit not run | Reproduction not demonstrated end-to-end | Final package incomplete | **OPEN** | Complete after live Phase 9 evidence, IaC reconciliation, final documentation, fresh-environment reproduction, and ACT-0–ACT-10 audit. |
 
 ## Mission 1 result
@@ -86,3 +86,14 @@ cluster and two scoped role assignments: three creates, no changes, and no
 destroys. No Terraform apply or live Kubernetes experiment occurred. Phase 9
 is therefore OPEN and stopped at its explicit resource/cost approval gate;
 Phase 10 has not begun.
+
+## Mission 6 Stage 2 preflight result
+
+The operator approved the exact Stage 1 envelope. Required AKS providers were
+registered, a separate secretless exact-main apply identity was configured with
+scoped Azure roles, and trusted-main plan `37233428622` remained exactly three
+creates with the Free tier and one fixed `Standard_D2as_v5` node. Azure,
+however, reports zero West US 3 DASv5-family vCPU quota and rejected both
+minimum 2-vCPU requests as `QuotaNotAvailableForResource`. No apply was
+dispatched, no cluster or node resource group exists, and no unapproved compute
+substitution was made. Phase 9 remains OPEN and provisioning-blocked.
