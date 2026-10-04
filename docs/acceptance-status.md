@@ -4,20 +4,21 @@ Authoritative rule: a phase is complete only when it is implemented, tested,
 demonstrated, evidenced, and its exact acceptance test passes. Code presence,
 plausible tests, Terraform validation, or a green CI run alone is not a PASS.
 
-Last updated: 2026-10-04 UTC during the Mission 3 audit, based on merged Mission 2
-commit `51b9deb6777ebb8124bcbaebb718297c1c2c2490`.
+Last updated: 2026-10-04 UTC during the Mission 4 audit, based on merged control
+commit `f0176831c0a3686f6b53d6fcb135eb915c2f0960` and the retained live Phase 6
+demonstrations.
 
 | Phase | Implementation | Tests | Demonstration | Evidence | Status | Exact blocker |
 |---|---|---|---|---|---|---|
 | 0 — Repository and scope | Complete | Complete | Complete | Complete | **PASS** | None. |
-| 1 — Monitored application | Complete | 8 focused endpoint/fault tests and 48 full-suite tests pass | Normal app plus semantic-health and HTTP-500 faults demonstrated from one Docker image | [ACT-1 application and Docker evidence](phase1-application.md) | **PASS** | None. Both faults are environment-driven; no public fault-control endpoint exists. |
+| 1 — Monitored application | Complete | 8 focused endpoint/fault tests and 62 current full-suite tests pass | Normal app plus semantic-health and HTTP-500 faults demonstrated from one Docker image | [ACT-1 application and Docker evidence](phase1-application.md) | **PASS** | None. Both faults are environment-driven; no public fault-control endpoint exists. |
 | 2 — External checker | Complete | Current checker tests pass | Previously demonstrated | Final ACT evidence audit pending | **PASS, final audit pending** | Reconfirm the final matrix explicitly covers healthy, HTTP failure, invalid content, timeout, request exception, and structured timestamp/status/latency/error output. |
 | 3 — Azure workload | Complete | Deployment checks exist | Externally reachable Azure deployment established | Existing cloud evidence | **PASS** | None. |
 | 4 — Monitoring service | Container App monitor works; authoritative Function absent | Monitor tests pass | Container App operation demonstrated | Container App logs and persistence exist | **MISMATCH / OPEN** | Specification requires a Python timer-triggered Azure Function and Terraform-managed Function resources. Implement that path or obtain explicit approval for a specification amendment. |
 | 5 — Incident lifecycle | Complete | Deterministic PostgreSQL overlap test plus lifecycle/dedup suites pass | Incident #2 lifecycle demonstrated; two overlapping threshold checks serialize to one opening | [Incident #2 report](incidents/incident-002.md) and [concurrency proof](phase5-concurrency.md) | **PASS** | None. The production state-row lock was directly observed blocking the second execution; exactly one incident and one opening-notification row persisted. |
-| 6 — CI/CD and infrastructure automation | Major deployment path exists | CI and verifier tests pass | Deployments #4/#5 demonstrated | GitHub run evidence exists | **OPEN** | Controlled Terraform plan/review and approval path, permission/environment audits, and an isolated deliberately failing test that demonstrably blocks deploy remain required. |
-| 7 — Observability | Complete for current architecture | Current suite: 48 passed; Phase 8 subset: 8 passed | Incident #2 signals correlated across deployment, checker, App Insights, lifecycle, notification, rollback, and recovery | [Incident #2 timeline](incidents/incident-002.md) and [App Insights evidence](incidents/evidence/incident-002-app-insights.md) | **PASS** | None for ACT-7. Signal limitations and the bounded causal inference are documented. |
-| 8 — Recovery and rollback | Complete | Current suite: 48 passed; verifier/fault subset: 8 passed | Broken revision detected; operator rollback recovered; fixed verifier deployed and passed six samples | [Incident #2 report](incidents/incident-002.md), [Azure logs/database evidence](incidents/evidence/incident-002-azure-logs.md), and [Deploy #4 excerpt](incidents/evidence/incident-002-deploy4.log) | **PASS** | None for ACT-8. The exact early-request revision remains unknowable and is correctly labeled as a limitation, not a fabricated fact. |
+| 6 — CI/CD and infrastructure automation | Complete | Current suite: 62 passed; 14 focused control tests; 4 verifier tests | Reviewed normal/refresh plans, separate approved state-only apply, live rejection controls, failed-test deployment block, and healthy Deploy #5 demonstrated | [ACT-6 acceptance evidence](ci-cd/phase6-acceptance.md) | **PASS** | None. Approval is an explicitly demonstrated solo-operator manual boundary, not a claimed GitHub required-reviewer environment. |
+| 7 — Observability | Complete for current architecture | Current suite: 62 passed; Phase 8 subset: 8 passed | Incident #2 signals correlated across deployment, checker, App Insights, lifecycle, notification, rollback, and recovery | [Incident #2 timeline](incidents/incident-002.md) and [App Insights evidence](incidents/evidence/incident-002-app-insights.md) | **PASS** | None for ACT-7. Signal limitations and the bounded causal inference are documented. |
+| 8 — Recovery and rollback | Complete | Current suite: 62 passed; verifier/fault subset: 8 passed | Broken revision detected; operator rollback recovered; fixed verifier deployed and passed six samples | [Incident #2 report](incidents/incident-002.md), [Azure logs/database evidence](incidents/evidence/incident-002-azure-logs.md), and [Deploy #4 excerpt](incidents/evidence/incident-002-deploy4.log) | **PASS** | None for ACT-8. The exact early-request revision remains unknowable and is correctly labeled as a limitation, not a fabricated fact. |
 | 9 — Kubernetes / deeper observability | Not started in authoritative terms | Not started | Not started | Not started | **NOT STARTED** | Repository implementation, static tests, and a reviewed resource/cost plan are required. Explicit approval is required before provisioning AKS. |
 | 10 — Portfolio publication | Open | Final audit not run | Reproduction not demonstrated end-to-end | Final package incomplete | **OPEN** | Complete after live Phase 9 evidence, IaC reconciliation, final documentation, fresh-environment reproduction, and ACT-0–ACT-10 audit. |
 
@@ -44,3 +45,15 @@ protocol-distinct `http_500` mode is now configuration-driven through the same
 environment variable. Focused and full tests pass, and one Docker image was
 demonstrated in normal, semantic-failure, and HTTP-failure configurations.
 ACT-1 passes all seven requirements, so Phase 1 is marked PASS.
+
+## Mission 4 result
+
+The controlled Terraform path is implemented and live-demonstrated. Trusted
+`main` produces retained, reviewable plans; a separate manual workflow requires
+the exact run and literal operator confirmation, rejects mismatched or stale
+plans, and uses a distinct scoped OIDC identity. A reviewed refresh-only plan
+was applied with zero Azure resource changes. Live negative runs rejected an
+invalid confirmation, a non-main dispatch, and a stale replay. An isolated
+deliberately failing test caused validation to fail and the real downstream
+deployment job to be skipped; the experiment was closed unmerged and deleted.
+All thirteen ACT-6 rows pass, so Phase 6 is marked PASS.
