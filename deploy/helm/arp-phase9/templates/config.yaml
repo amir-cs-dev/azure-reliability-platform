@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: arp-prometheus-config
+  labels:
+    {{- include "arp-phase9.labels" . | nindent 4 }}
+data:
+  prometheus.yml: |-
+{{ .Files.Get "files/prometheus.yml" | indent 4 }}
+  arp-rules.yml: |-
+{{ .Files.Get "files/arp-rules.yml" | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: arp-alertmanager-config
+  labels:
+    {{- include "arp-phase9.labels" . | nindent 4 }}
+data:
+  alertmanager.yml: |-
+{{ .Files.Get "files/alertmanager.yml" | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: arp-grafana-provisioning
+  labels:
+    {{- include "arp-phase9.labels" . | nindent 4 }}
+data:
+  datasource.yml: |-
+{{ .Files.Get "files/grafana-datasource.yml" | indent 4 }}
+  dashboard-provider.yml: |-
+{{ .Files.Get "files/grafana-dashboard-provider.yml" | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: arp-grafana-dashboard
+  labels:
+    {{- include "arp-phase9.labels" . | nindent 4 }}
+data:
+  reliability.json: |-
+{{ .Files.Get "files/grafana-dashboard.json" | indent 4 }}

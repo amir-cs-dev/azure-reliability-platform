@@ -72,6 +72,11 @@ Additional tests cover invalid state transitions, restart behavior, duplicate pr
 
 The 2026-10-04 Mission 4 audit completed with **62 passing tests**, including the PostgreSQL integration tests against a disposable local `arp_test` database. The focused application endpoint and controlled-fault suite completed with **8 passing tests**; the Terraform artifact/workflow control suite completed with **14 passing tests**.
 
+Phase 9 Stage 1 extends the current suite to **85 passing tests**, including
+Prometheus metrics, minimal AKS/Helm architecture, observability assets, and
+the isolated Phase 9 plan/apply controls. Static validation does not make
+Phase 9 PASS; live AKS acceptance remains approval-gated.
+
 ## Containerization
 
 The FastAPI application is packaged as a Docker image using a minimal Python runtime and a non-root application user.
@@ -132,6 +137,16 @@ ACT-4 is closed by the [Phase 4 Azure Function evidence](docs/phase4-azure-funct
 
 ACT-6 is closed by the [Phase 6 CI/CD acceptance evidence](docs/ci-cd/phase6-acceptance.md). Pull requests receive full validation, while trusted `main` produces a retained Terraform plan. Infrastructure apply is a separate manual workflow that requires the reviewed plan run ID and literal `APPLY`, verifies the exact source/configuration/state/artifact, and uses an apply-only OIDC identity. A safe refresh-only apply and live rejection/failing-test experiments demonstrate the controls without creating a production revision or outage.
 
+### Kubernetes and deeper observability
+
+Phase 9 Stage 1 is implemented and statically validated in the [Phase 9
+package](docs/phase9/README.md). It defines an isolated one-node AKS lab,
+digest-pinned Helm deployment, application metrics, in-cluster Prometheus,
+Grafana, Alertmanager, kube-state-metrics, a real rolling-failure/rollback
+experiment, and controlled teardown. The [resource and cost
+gate](docs/phase9/cost-gate.md) is awaiting explicit approval. No AKS resource
+has been applied and Phase 9 remains OPEN.
+
 ## Technology Stack
 
 | Component              | Technology                 |
@@ -145,6 +160,8 @@ ACT-6 is closed by the [Phase 6 CI/CD acceptance evidence](docs/ci-cd/phase6-acc
 | CI                     | GitHub Actions             |
 | Infrastructure as code | Terraform                  |
 | Cloud platform         | Microsoft Azure            |
+| Kubernetes packaging   | AKS, Helm                   |
+| Deeper observability   | Prometheus, Grafana, Alertmanager |
 
 CI, application deployment, Terraform planning, and operator-approved Terraform apply are separate workflows with explicit least-privilege permissions.
 
@@ -162,13 +179,11 @@ CI, application deployment, Terraform planning, and operator-approved Terraform 
 
 **Remaining authoritative work**
 
-* Phase 9 Kubernetes/deeper-observability implementation after explicit approval.
+* Explicit approval of the Phase 9 resource/cost gate.
+* Live AKS provisioning, deployment, reliability experiment, evidence, and teardown.
 
 **Planned**
 
-* Cloud observability and operational dashboards.
-* Deployment rollback and recovery testing.
-* Kubernetes deployment with AKS.
 * Performance and reliability measurement.
 * AWS implementation.
 
@@ -189,6 +204,8 @@ app/                FastAPI application
 monitor/            Monitoring and incident management
 tests/              Automated regression tests
 docs/               Architecture and operational documentation
+deploy/helm/        Repeatable Phase 9 Kubernetes deployment
+infra/              Isolated application and temporary AKS Terraform roots
 .github/workflows/  CI configuration
 Dockerfile          Application container definition
 requirements.txt    Application dependencies

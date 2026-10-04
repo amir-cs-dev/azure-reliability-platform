@@ -55,3 +55,28 @@ def test_application_deploy_remains_validation_gated_and_main_only():
     assert "github.ref == 'refs/heads/main'" in deploy
     assert "id-token: write" in deploy
     assert "write-all" not in deploy
+
+
+def test_phase9_plan_is_isolated_and_never_applies_automatically():
+    plan = workflow("phase9-terraform-plan.yml")
+    assert "needs: validate" in plan
+    assert "phase9.terraform.tfstate" in plan
+    assert "phase9-terraform-plan" in plan
+    assert "-destroy" in plan
+    assert "terraform apply" not in plan
+    assert "infra/phase9" in plan
+    assert "retention-days: 7" in plan
+
+
+def test_phase9_apply_requires_exact_manual_current_main_plan():
+    apply = workflow("phase9-terraform-apply.yml")
+    assert "workflow_dispatch:" in apply
+    assert '== "APPLY"' in apply
+    assert "refs/heads/main" in apply
+    assert "phase9-terraform-plan.yml" in apply
+    assert "phase9.terraform.tfstate" in apply
+    assert "terraform_plan_artifact.py validate" in apply
+    assert "Apply exact reviewed Phase 9 binary plan" in apply
+    assert "id-token: write" in apply
+    assert "AZURE_PHASE9_TERRAFORM_APPLY_CLIENT_ID" in apply
+    assert "AZURE_TERRAFORM_APPLY_CLIENT_ID" not in apply
