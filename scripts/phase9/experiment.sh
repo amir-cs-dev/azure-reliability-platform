@@ -28,10 +28,45 @@ grafana_pid=""
 target_changed=false
 original_target=""
 
-cleanup() {
-  for pid in "$load_pid" "$prometheus_pid" "$alertmanager_pid" "$grafana_pid"; do
+stop_port_forwards() {
+  for pid in "$prometheus_pid" "$alertmanager_pid" "$grafana_pid"; do
     [[ -n "$pid" ]] && kill "$pid" >/dev/null 2>&1 || true
   done
+  for pid in "$prometheus_pid" "$alertmanager_pid" "$grafana_pid"; do
+    [[ -n "$pid" ]] && wait "$pid" >/dev/null 2>&1 || true
+  done
+  prometheus_pid=""
+  alertmanager_pid=""
+  grafana_pid=""
+}
+
+start_port_forwards() {
+  stop_port_forwards
+  kubectl -n "$namespace" port-forward service/arp-prometheus 19090:9090 \
+    >> "$evidence/prometheus-port-forward.log" 2>&1 &
+  prometheus_pid=$!
+  kubectl -n "$namespace" port-forward service/arp-alertmanager 19093:9093 \
+    >> "$evidence/alertmanager-port-forward.log" 2>&1 &
+  alertmanager_pid=$!
+  kubectl -n "$namespace" port-forward service/arp-grafana 13000:3000 \
+    >> "$evidence/grafana-port-forward.log" 2>&1 &
+  grafana_pid=$!
+
+  for _ in $(seq 1 30); do
+    if curl --fail --silent http://127.0.0.1:19090/-/healthy >/dev/null \
+      && curl --fail --silent http://127.0.0.1:19093/-/healthy >/dev/null \
+      && curl --fail --silent http://127.0.0.1:13000/api/health >/dev/null; then
+      return 0
+    fi
+    sleep 1
+  done
+  echo "Private observability port-forwards did not become healthy." >&2
+  return 1
+}
+
+cleanup() {
+  [[ -n "$load_pid" ]] && kill "$load_pid" >/dev/null 2>&1 || true
+  stop_port_forwards
   if [[ "$target_changed" == true && -n "$original_target" ]]; then
     az functionapp config appsettings set \
       --resource-group "$resource_group" \
@@ -72,16 +107,7 @@ curl --fail --silent "$application_url/health" > "$evidence/baseline-health.json
 curl --fail --silent "$application_url/ready" > "$evidence/baseline-ready.json"
 curl --fail --silent "$application_url/metrics" > "$evidence/baseline-metrics.txt"
 
-kubectl -n "$namespace" port-forward service/arp-prometheus 19090:9090 \
-  > "$evidence/prometheus-port-forward.log" 2>&1 &
-prometheus_pid=$!
-kubectl -n "$namespace" port-forward service/arp-alertmanager 19093:9093 \
-  > "$evidence/alertmanager-port-forward.log" 2>&1 &
-alertmanager_pid=$!
-kubectl -n "$namespace" port-forward service/arp-grafana 13000:3000 \
-  > "$evidence/grafana-port-forward.log" 2>&1 &
-grafana_pid=$!
-sleep 5
+start_port_forwards
 
 curl --fail --silent http://127.0.0.1:19090/api/v1/targets \
   > "$evidence/prometheus-targets-baseline.json"
@@ -149,6 +175,7 @@ kubectl -n "$namespace" get deployment,replicaset,pod -o wide \
   > "$evidence/kubernetes-fault.txt"
 
 sleep 135
+start_port_forwards
 curl --silent --get \
   --data-urlencode 'query=ALERTS{alertstate="firing",service="arp-api"}' \
   http://127.0.0.1:19090/api/v1/query \
@@ -175,6 +202,7 @@ kubectl -n "$namespace" get deployment,replicaset,pod -o wide \
   > "$evidence/kubernetes-recovered.txt"
 
 sleep 90
+start_port_forwards
 curl --fail --silent "$application_url/health" \
   > "$evidence/recovered-health.json"
 curl --fail --silent --get \
