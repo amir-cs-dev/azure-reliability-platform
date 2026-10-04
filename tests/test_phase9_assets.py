@@ -89,6 +89,7 @@ def test_grafana_dashboard_queries_real_reliability_metrics():
 
 def test_experiment_has_real_fault_rollout_rollback_and_external_checker():
     experiment = read(ROOT / "scripts" / "phase9" / "experiment.sh")
+    load = read(ROOT / "scripts" / "phase9" / "load.py")
 
     assert "deployment.faultMode=http_500" in experiment
     assert "rollout status deployment/arp-api" in experiment
@@ -99,6 +100,8 @@ def test_experiment_has_real_fault_rollout_rollback_and_external_checker():
     assert "external-checker-baseline.json" in experiment
     assert "target_switched_at" in experiment
     assert "external-checker-recovery.json" in experiment
+    assert "from urllib.request import urlopen" in load
+    assert "import requests" not in load
 
 
 def test_deploy_digest_lookup_ignores_untagged_acr_manifests():
