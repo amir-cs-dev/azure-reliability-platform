@@ -70,7 +70,7 @@ The test suite exercises application health checks, monitoring behavior, inciden
 
 Additional tests cover invalid state transitions, restart behavior, duplicate prevention, and transaction rollback.
 
-The 2026-10-04 Mission 2 audit completed with **46 passing tests**, including the PostgreSQL integration tests against a disposable local `arp_test` database. The focused controlled-fault and deployment-verifier subset completed with **6 passing tests**.
+The 2026-10-04 Mission 3 audit completed with **48 passing tests**, including the PostgreSQL integration tests against a disposable local `arp_test` database. The focused application endpoint and controlled-fault suite completed with **8 passing tests**.
 
 ## Containerization
 
@@ -109,6 +109,18 @@ The controlled semantic-health failure, detection, Discord notification delivery
 The report includes the complete ACT-7 timeline, ACT-8 rollback audit, exact deployment and revision references, Application Insights results, real notification timings, telemetry limitations, and the bounded—not overstated—revision-cutover diagnosis. Phase 7 and Phase 8 are PASS; other phases retain their explicit blockers in the acceptance-status table.
 
 Phase 5's final concurrency requirement is closed by a [deterministic PostgreSQL overlap test and evidence report](docs/phase5-concurrency.md). The test observes the second monitor execution waiting on the production state-row lock and verifies that two overlapping threshold checks persist exactly one incident and one opening-notification record.
+
+### Controlled application failures
+
+ACT-1 is closed by the [Phase 1 application and Docker evidence](docs/phase1-application.md). The application supports two environment-driven fault modes without exposing a public control endpoint:
+
+| `ARP_PHASE8_FAULT` value | `/health` result |
+|---|---|
+| unset | HTTP 200 `{"status":"healthy"}` |
+| `invalid_health` | HTTP 200 `{"status":"degraded"}` |
+| `http_500` | HTTP 500 `{"detail":"Controlled health failure"}` |
+
+The first fault violates the semantic body contract while retaining HTTP success; the second is a distinct HTTP status failure. Normal production behavior remains the default when the variable is unset.
 
 ## Technology Stack
 
