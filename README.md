@@ -70,7 +70,7 @@ The test suite exercises application health checks, monitoring behavior, inciden
 
 Additional tests cover invalid state transitions, restart behavior, duplicate prevention, and transaction rollback.
 
-The 2026-10-04 Mission 1 audit completed with **45 passing tests**, including the PostgreSQL integration tests against a disposable local `arp_test` database. The focused controlled-fault and deployment-verifier subset completed with **6 passing tests**.
+The 2026-10-04 Mission 2 audit completed with **46 passing tests**, including the PostgreSQL integration tests against a disposable local `arp_test` database. The focused controlled-fault and deployment-verifier subset completed with **6 passing tests**.
 
 ## Containerization
 
@@ -107,6 +107,8 @@ Final database inspection verified that both notifications had a delivered statu
 The controlled semantic-health failure, detection, Discord notification delivery, operator rollback, persisted recovery, and verifier remediation are documented in the reviewer-facing [Incident #2 report](docs/incidents/incident-002.md).
 
 The report includes the complete ACT-7 timeline, ACT-8 rollback audit, exact deployment and revision references, Application Insights results, real notification timings, telemetry limitations, and the bounded—not overstated—revision-cutover diagnosis. Phase 7 and Phase 8 are PASS; other phases retain their explicit blockers in the acceptance-status table.
+
+Phase 5's final concurrency requirement is closed by a [deterministic PostgreSQL overlap test and evidence report](docs/phase5-concurrency.md). The test observes the second monitor execution waiting on the production state-row lock and verifies that two overlapping threshold checks persist exactly one incident and one opening-notification record.
 
 ## Technology Stack
 
