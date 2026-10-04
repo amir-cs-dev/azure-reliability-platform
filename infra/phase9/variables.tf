@@ -47,5 +47,5 @@ variable "kubernetes_version" {
 variable "system_node_vm_size" {
   description = "Single system-node VM SKU for the temporary lab."
   type        = string
-  default     = "Standard_D2as_v5"
+  default     = "Standard_D2as_v4"
 }

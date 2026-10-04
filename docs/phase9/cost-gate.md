@@ -2,12 +2,15 @@
 
 Date: 2026-10-04 UTC
 
-Decision state: **APPROVED AS DESIGNED; APPLY BLOCKED BY ZERO DASV5 QUOTA**
+Decision state: **APPROVED WITH D2AS_V4 COMPUTE SUBSTITUTION; FRESH PLAN REQUIRED**
 
-The operator approved this exact resource envelope. The local and fresh
-trusted-main plans were not applied because Azure reports zero DASv5-family
-vCPU quota and rejected the minimum 2-vCPU increase. See the [Stage 2
-preflight](stage2-preflight.md).
+The operator approved this exact resource envelope and later approved the
+single substitution from `Standard_D2as_v5` to `Standard_D2as_v4` after Azure
+rejected the minimum DASv5-family quota request. No other architecture or cost
+gate changed. The D2as_v4 SKU is available in West US 3, has 2 vCPU and 8 GiB,
+and its DASv4-family quota is 10 vCPUs with zero currently consumed. Apply is
+still prohibited until a fresh trusted-main D2as_v4 plan passes the complete
+material-envelope audit. See the [Stage 2 preflight](stage2-preflight.md).
 
 ## Terraform plan summary
 
@@ -38,8 +41,9 @@ the billable lab resources. AzureRM is configured with automatic provider
 registration disabled so this mutation cannot happen implicitly.
 Subscription quota for the selected compute family could not be enumerated
 while `Microsoft.Compute` was unregistered. Stage 2 then found zero DASv5
-family quota and both exact 2-vCPU requests failed. Changing the node SKU,
-region, or count requires an updated plan and cost approval.
+family quota and both exact 2-vCPU requests failed. The operator subsequently
+approved only the D2as_v4 substitution. Any further change to the node SKU,
+region, count, or architecture requires an updated plan and approval.
 
 The AKS service will create supporting objects in its dedicated managed node
 resource group `rg-arp-phase9-nodes-wus3`. Expected platform-managed resources
@@ -60,7 +64,7 @@ Stage 2 must inventory them before declaring the plan reconciled.
 | AKS pricing tier | `Free` control-plane tier; no uptime SLA |
 | Kubernetes support plan/version | KubernetesOfficial, 1.35 (current West US 3 default when checked) |
 | System node pool | `system`, mode System |
-| VM size | `Standard_D2as_v5` (2 vCPU, 8 GiB) |
+| VM size | `Standard_D2as_v4` (2 vCPU, 8 GiB) |
 | Node count | exactly 1 |
 | Autoscaling | disabled; no min/max range |
 | Upgrade surge | 1 temporary surge node may exist during a node upgrade |
@@ -129,16 +133,16 @@ discounts, reservations, Spot pricing, taxes, or egress. Rates observed on
 
 | Driver | Retail observation | Approximate lab contribution |
 |---|---|---|
-| One Linux `Standard_D2as_v5` VM in West US 3 | USD 0.086/hour | USD 0.086/hour |
+| One Linux `Standard_D2as_v4` VM in West US 3 | USD 0.096/hour | USD 0.096/hour |
 | Standard Load Balancer included rules | USD 0.025/hour | USD 0.025/hour |
 | Two Standard IPv4 static addresses | USD 0.005/hour each | USD 0.010/hour |
 | P4 LRS managed disk | USD 4.8001/month plus USD 0.26/month mount | about USD 0.007/hour |
 | AKS Free control plane | no cluster-management charge | USD 0/hour control plane |
 | Load Balancer data | USD 0.005/GB | negligible for bounded test traffic |
 
-Expected steady exposure is approximately **USD 0.13/hour**, or **USD
-3.1/day**, before egress, taxes, unusual build/storage consumption, or a
-temporary upgrade surge node. Use **USD 0.12–0.16/hour (roughly USD 3–4/day)**
+Expected steady exposure is approximately **USD 0.14/hour**, or **USD
+3.3/day**, before egress, taxes, unusual build/storage consumption, or a
+temporary upgrade surge node. Use **USD 0.13–0.17/hour (roughly USD 3–4/day)**
 as the planning range. An upgrade surge can temporarily add another VM and disk
 and roughly double compute exposure. Existing ACR and external platform costs
 continue independently; one additional image/build has minimal incremental
@@ -188,6 +192,6 @@ ACT-9 requirement.
 ## Approval boundary
 
 No command in Stage 1 created AKS or another materially billable Phase 9
-resource. The operator subsequently approved this envelope. Apply remains
-prohibited until the exact compute quota is available and a fresh
-trusted-`main` plan passes the same material-envelope audit.
+resource. The operator subsequently approved this envelope and only the
+D2as_v4 compute substitution. Apply remains prohibited until a fresh
+trusted-`main` D2as_v4 plan passes the same material-envelope audit.

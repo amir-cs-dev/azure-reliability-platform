@@ -15,6 +15,7 @@ def test_aks_is_minimal_isolated_and_reuses_existing_acr():
     aks = read(PHASE9_TF / "aks.tf")
     backend = read(PHASE9_TF / "backend.tf")
     main = read(PHASE9_TF / "main.tf")
+    variables = read(PHASE9_TF / "variables.tf")
 
     assert 'sku_tier                  = "Free"' in aks
     assert 'node_count           = 1' in aks
@@ -26,6 +27,8 @@ def test_aks_is_minimal_isolated_and_reuses_existing_acr():
     assert 'key              = "phase9.terraform.tfstate"' in backend
     assert 'data "azurerm_container_registry" "app"' in main
     assert "azurerm_log_analytics_workspace" not in aks
+    assert 'default     = "Standard_D2as_v4"' in variables
+    assert "Standard_D2as_v5" not in variables
 
 
 def test_application_uses_digest_probes_limits_and_rolling_update():
