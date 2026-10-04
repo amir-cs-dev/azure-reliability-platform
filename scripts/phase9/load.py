@@ -8,9 +8,9 @@ import json
 import time
 from collections import Counter
 from datetime import datetime, timezone
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
-
-import requests
+from urllib.request import urlopen
 
 
 def main() -> int:
@@ -36,9 +36,11 @@ def main() -> int:
     while time.monotonic() < deadline:
         started = time.perf_counter()
         try:
-            response = requests.get(args.url, timeout=5)
-            statuses[str(response.status_code)] += 1
-        except requests.RequestException:
+            with urlopen(args.url, timeout=5) as response:
+                statuses[str(response.status)] += 1
+        except HTTPError as error:
+            statuses[str(error.code)] += 1
+        except (URLError, TimeoutError):
             statuses["request_error"] += 1
         latencies.append((time.perf_counter() - started) * 1000)
         time.sleep(args.interval)
