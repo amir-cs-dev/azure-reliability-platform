@@ -100,6 +100,8 @@ def test_experiment_has_real_fault_rollout_rollback_and_external_checker():
     assert "external-checker-baseline.json" in experiment
     assert "target_switched_at" in experiment
     assert "external-checker-recovery.json" in experiment
+    assert experiment.count("start_port_forwards") == 4
+    assert "Private observability port-forwards did not become healthy" in experiment
     assert "from urllib.request import urlopen" in load
     assert "import requests" not in load
 
