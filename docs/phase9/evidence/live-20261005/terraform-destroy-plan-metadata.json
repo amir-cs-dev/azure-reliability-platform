@@ -1,0 +1,76 @@
+{
+  "artifact_name": "phase9-terraform-plan-37253535368",
+  "backend": {
+    "container": "tfstate",
+    "key": "phase9.terraform.tfstate",
+    "lineage": "3fb12007-bf85-15a3-843c-a31a6157b798",
+    "resource_group": "rg-arp-tfstate-wus3",
+    "serial": 3,
+    "storage_account": "starptf3e6c8737fb3a44be",
+    "type": "azurerm"
+  },
+  "created_at": "2026-10-05T02:01:19.942499+00:00",
+  "plan": {
+    "files": {
+      "plan.tfplan": {
+        "sha256": "f12cfcc8ceae04f90ee325f43b88afe6da19d82d6f873fac467a297323125de4",
+        "size_bytes": 23103
+      },
+      "plan.txt": {
+        "sha256": "29864368b2e6fb9e2816be2d6bbbcaae183565ff88a3674ae5cea1a0ed0c5dcc",
+        "size_bytes": 10918
+      }
+    },
+    "summary": {
+      "affected_resources": [
+        {
+          "actions": [
+            "delete"
+          ],
+          "address": "azurerm_kubernetes_cluster.phase9"
+        },
+        {
+          "actions": [
+            "delete"
+          ],
+          "address": "azurerm_role_assignment.aks_acr_pull"
+        },
+        {
+          "actions": [
+            "delete"
+          ],
+          "address": "azurerm_role_assignment.operator_cluster_admin"
+        }
+      ],
+      "counts": {
+        "create": 0,
+        "delete": 3,
+        "read": 0,
+        "replace": 0,
+        "update": 0
+      }
+    }
+  },
+  "repository": "amir-cs-dev/azure-reliability-platform",
+  "schema_version": 1,
+  "source": {
+    "branch": "main",
+    "event": "workflow_dispatch",
+    "infra_tree": "ddf19d3463f2b68685bfdf55582417ec9b92be83",
+    "ref": "refs/heads/main",
+    "sha": "bc980c450401c03371b86c8aa139c5fbbbd729a9"
+  },
+  "terraform": {
+    "operation": "destroy",
+    "plan_exit_code": 2,
+    "version": "1.16.3"
+  },
+  "variables": {
+    "image_tag": "e531acdbcc1ef3b85e46e213b4130acaba31ef4b"
+  },
+  "workflow": {
+    "run_attempt": "1",
+    "run_id": "37253535368",
+    "workflow_ref": "amir-cs-dev/azure-reliability-platform/.github/workflows/phase9-terraform-plan.yml@refs/heads/main"
+  }
+}

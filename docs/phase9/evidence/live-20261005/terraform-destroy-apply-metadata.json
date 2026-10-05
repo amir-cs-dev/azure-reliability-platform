@@ -1,0 +1,14 @@
+{
+  "repository": "amir-cs-dev/azure-reliability-platform",
+  "apply_run_id": "37253751373",
+  "plan_run_id": "37253535368",
+  "source_sha": "bc980c450401c03371b86c8aa139c5fbbbd729a9",
+  "operator": "amir-cs-dev",
+  "confirmation": "APPLY",
+  "operation": "destroy",
+  "applied_at": "2026-10-05T02:08:04Z",
+  "state": {
+    "lineage": "3fb12007-bf85-15a3-843c-a31a6157b798",
+    "serial": 5
+  }
+}

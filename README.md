@@ -72,10 +72,11 @@ Additional tests cover invalid state transitions, restart behavior, duplicate pr
 
 The 2026-10-04 Mission 4 audit completed with **62 passing tests**, including the PostgreSQL integration tests against a disposable local `arp_test` database. The focused application endpoint and controlled-fault suite completed with **8 passing tests**; the Terraform artifact/workflow control suite completed with **14 passing tests**.
 
-Phase 9 Stage 1 extends the current suite to **85 passing tests**, including
-Prometheus metrics, minimal AKS/Helm architecture, observability assets, and
-the isolated Phase 9 plan/apply controls. Static validation does not make
-Phase 9 PASS; live AKS acceptance remains approval-gated.
+Phase 9 extends the current suite to **87 passing tests**, including
+Prometheus metrics, AKS/Helm architecture, observability assets, and the
+isolated Phase 9 plan/apply controls. The same CI gate also validates both
+Docker images, container health, Terraform, Helm, 21 Kubernetes resources,
+Prometheus, Alertmanager, and Grafana.
 
 ## Containerization
 
@@ -145,8 +146,10 @@ evidence](docs/phase9/live-acceptance.md). The reviewed D2as_v4 plan created
 only the isolated cluster and two role assignments. The digest-pinned Helm
 deployment, probes, application metrics, in-cluster Prometheus/Grafana/
 Alertmanager/kube-state-metrics, external Function checker, controlled fault,
-real rolling update, actual rollback, alerts, and recovery all pass. Phase 9
-remains OPEN only until the evidence-safe exact-plan teardown is demonstrated.
+real rolling update, actual rollback, alerts, and recovery all pass. A separate
+reviewed destroy removed the Helm workloads, public service, cluster, and two
+tracked role assignments; shared services survived and the isolated state now
+tracks zero resources. Phase 9 is **PASS**.
 
 ## Technology Stack
 
@@ -180,7 +183,7 @@ CI, application deployment, Terraform planning, and operator-approved Terraform 
 
 **Remaining authoritative work**
 
-* Complete the reviewed Phase 9 teardown and preservation audit.
+* Complete Phase 10 portfolio publication and the final ACT-0–ACT-10 audit.
 
 **Planned**
 

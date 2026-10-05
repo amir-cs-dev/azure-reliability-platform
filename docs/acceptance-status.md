@@ -4,8 +4,9 @@ Authoritative rule: a phase is complete only when it is implemented, tested,
 demonstrated, evidenced, and its exact acceptance test passes. Code presence,
 plausible tests, Terraform validation, or a green CI run alone is not a PASS.
 
-Last updated: 2026-10-05 UTC after the reviewed D2as_v4 apply and complete live
-Phase 9 baseline, fault, alert, rolling-update, rollback, and recovery chain.
+Last updated: 2026-10-05 UTC after the complete live Phase 9 chain, reviewed
+exact-plan teardown, shared-resource preservation audit, and state
+reconciliation.
 
 | Phase | Implementation | Tests | Demonstration | Evidence | Status | Exact blocker |
 |---|---|---|---|---|---|---|
@@ -18,8 +19,8 @@ Phase 9 baseline, fault, alert, rolling-update, rollback, and recovery chain.
 | 6 — CI/CD and infrastructure automation | Complete | Current suite: 62 passed; 14 focused control tests; 4 verifier tests | Reviewed normal/refresh plans, separate approved state-only apply, live rejection controls, failed-test deployment block, and healthy Deploy #5 demonstrated | [ACT-6 acceptance evidence](ci-cd/phase6-acceptance.md) | **PASS** | None. Approval is an explicitly demonstrated solo-operator manual boundary, not a claimed GitHub required-reviewer environment. |
 | 7 — Observability | Complete for current architecture | Current suite: 62 passed; Phase 8 subset: 8 passed | Incident #2 signals correlated across deployment, checker, App Insights, lifecycle, notification, rollback, and recovery | [Incident #2 timeline](incidents/incident-002.md) and [App Insights evidence](incidents/evidence/incident-002-app-insights.md) | **PASS** | None for ACT-7. Signal limitations and the bounded causal inference are documented. |
 | 8 — Recovery and rollback | Complete | Current suite: 62 passed; verifier/fault subset: 8 passed | Broken revision detected; operator rollback recovered; fixed verifier deployed and passed six samples | [Incident #2 report](incidents/incident-002.md), [Azure logs/database evidence](incidents/evidence/incident-002-azure-logs.md), and [Deploy #4 excerpt](incidents/evidence/incident-002-deploy4.log) | **PASS** | None for ACT-8. The exact early-request revision remains unknowable and is correctly labeled as a limitation, not a fabricated fact. |
-| 9 — Kubernetes / deeper observability | Complete through recovered Helm revision 7; teardown automation ready | 27 focused Phase 9/control tests and 87-test PostgreSQL-backed full suite pass; all static/CI checks pass | Reviewed Terraform apply; healthy AKS baseline; live Prometheus/Grafana; routed alert; external Function incident; rolling fault revision; actual rollback and recovery | [Live acceptance report](phase9/live-acceptance.md) and [sanitized artifacts](phase9/evidence/live-20261005/) | **OPEN — TEARDOWN PENDING** | Remove Helm workloads, apply an exact three-resource destroy plan, and prove shared-resource preservation plus zero-resource state. |
-| 10 — Portfolio publication | Open | Final audit not run | Reproduction not demonstrated end-to-end | Final package incomplete | **OPEN** | Complete after live Phase 9 evidence, IaC reconciliation, final documentation, fresh-environment reproduction, and ACT-0–ACT-10 audit. |
+| 9 — Kubernetes / deeper observability | Complete, including controlled teardown | 27 focused Phase 9/control tests and 87-test PostgreSQL-backed full suite pass; all static/CI checks pass | Reviewed create/apply; healthy AKS baseline; live Prometheus/Grafana; routed alert; external Function incident; rolling fault revision; rollback/recovery; reviewed destroy and preservation audit | [Live acceptance report](phase9/live-acceptance.md) and [sanitized artifacts](phase9/evidence/live-20261005/) | **PASS** | None. The lab was removed through the exact-plan approval boundary; shared resources survived and isolated state tracks zero resources. |
+| 10 — Portfolio publication | Open | Final audit not run | Reproduction not demonstrated end-to-end | Final package incomplete | **OPEN** | Complete final documentation, fresh-environment reproduction, and the ACT-0–ACT-10 audit. |
 
 ## Mission 1 result
 
@@ -84,7 +85,7 @@ experiment, an isolated remote-state plan/apply boundary, and mandatory
 teardown tooling. The final local Terraform plan proposes exactly one AKS
 cluster and two scoped role assignments: three creates, no changes, and no
 destroys. No Terraform apply or live Kubernetes experiment occurred. Phase 9
-is therefore OPEN and stopped at its explicit resource/cost approval gate;
+was therefore OPEN and stopped at its explicit resource/cost approval gate;
 Phase 10 has not begun.
 
 ## Mission 6 Stage 2 preflight result
@@ -97,8 +98,9 @@ reported zero West US 3 DASv5-family vCPU quota and rejected both minimum
 2-vCPU requests as `QuotaNotAvailableForResource`. No apply was dispatched and
 no cluster or node resource group exists. The operator subsequently approved
 only a `Standard_D2as_v4` substitution after its availability, matching
-2-vCPU/8-GiB class, and sufficient DASv4 quota were verified. Phase 9 remains
-OPEN pending a fresh trusted-main plan, live ACT-9, evidence, and teardown.
+2-vCPU/8-GiB class, and sufficient DASv4 quota were verified. At that
+checkpoint, Phase 9 remained OPEN pending a fresh trusted-main plan, live
+ACT-9, evidence, and teardown.
 
 ## Mission 6 Stage 2 live acceptance result
 
@@ -119,5 +121,12 @@ the endpoint, both Prometheus health series, Alertmanager active-alert state,
 and Function lifecycle all recovered. The Function target was then restored to
 the original external application and subsequent timer runs remained healthy.
 
-Thirteen of fourteen matrix rows pass. Phase 9 remains OPEN solely because the
-required evidence-safe teardown and preservation audit have not yet been run.
+All fourteen matrix rows pass. Helm workloads and the public service were
+removed first. Destroy plan `37253535368` proposed only the AKS cluster and
+two tracked role assignments; separate apply `37253751373` destroyed exactly
+those three resources. AKS and its managed node resource group are absent,
+shared ACR/Container App/Function resources survived, the external checker
+remains healthy against its restored target, and state serial 5 tracks zero
+managed resources. Reconciliation plan `37254291825` proposes only the
+original three creates and was not applied. Phase 9 is **PASS**; Phase 10 has
+not begun.

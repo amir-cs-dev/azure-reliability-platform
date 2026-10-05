@@ -1,0 +1,13 @@
+{
+  "principalId": "5918498b-f247-4449-95df-68281087a571",
+  "principalType": "ServicePrincipal",
+  "roleDefinitionId": "/subscriptions/3e6c8737-fb3a-44be-8477-45e2f66a45f5/providers/Microsoft.Authorization/roleDefinitions/4abbcc35-e782-43d8-92c5-2d3f1bd2253f",
+  "roleName": "Azure Kubernetes Service Cluster User Role",
+  "actions": [
+    "Microsoft.ContainerService/managedClusters/listClusterUserCredential/action",
+    "Microsoft.ContainerService/managedClusters/read"
+  ],
+  "scope": "/subscriptions/3e6c8737-fb3a-44be-8477-45e2f66a45f5/resourcegroups/rg-arp-app-wus3/providers/Microsoft.ContainerService/managedClusters/aks-arp-phase9-wus3",
+  "createdOn": "2026-10-05T01:58:38.806109+00:00",
+  "postDestroyAssignments": []
+}

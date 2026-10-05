@@ -2,15 +2,13 @@
 
 Date: 2026-10-05 UTC
 
-Current verdict: **LIVE ACT-9 PROVISIONING, OBSERVABILITY, FAULT, ROLLBACK,
-AND RECOVERY PASS; CONTROLLED TEARDOWN OPEN**
+Current verdict: **ACT-9 PASS — 14/14 REQUIREMENTS**
 
-Phase 9 is not yet PASS because the expensive temporary lab has not been torn
-down. Its implementation, tests, provisioning, deployment, metrics,
-Prometheus, Grafana, Alertmanager, independent Function checking, controlled
-fault, rolling update, rollback, and recovery are demonstrated in the [live
-acceptance report](live-acceptance.md). The resource and cost gate is in
-[cost-gate.md](cost-gate.md), Stage 1 results are in
+Phase 9 implementation, tests, provisioning, deployment, metrics, Prometheus,
+Grafana, Alertmanager, independent Function checking, controlled fault,
+rolling update, rollback, recovery, and evidence-safe teardown are demonstrated
+in the [live acceptance report](live-acceptance.md). The resource and cost gate
+is in [cost-gate.md](cost-gate.md), Stage 1 results are in
 [stage1-validation.md](stage1-validation.md), and the controlled procedure is
 in [runbook.md](runbook.md).
 
@@ -25,7 +23,10 @@ were verified. Every other envelope constraint remains unchanged.
 Trusted-main plan `37235069628` and separately approved apply `37235364607`
 created only the cluster and two scoped role assignments. The accepted final
 experiment completed on 2026-10-05 UTC. Evidence was retained before starting
-the exact-plan teardown sequence.
+the exact-plan teardown sequence. Destroy plan `37253535368` and separately
+approved apply `37253751373` then removed those same three tracked resources.
+Post-destroy reconciliation plan `37254291825` reads the zero-resource state
+and proposes only the original three creates; it was not applied.
 
 ## Architecture
 
@@ -133,7 +134,7 @@ It did not apply anything. Initializing/planning created only an empty,
 non-billable state snapshot at the isolated state key (serial 1, zero tracked
 resources).
 
-## ACT-9 status before teardown
+## Final ACT-9 status
 
 | ACT-9 requirement | Demonstrated state | Result |
 |---|---|---|
@@ -150,7 +151,7 @@ resources).
 | Rollback | Actual Helm rollback restored known-good revision and pods | **PASS** |
 | Monitoring/alerts/recovery | Prometheus, Alertmanager, and Function all observed the chain | **PASS** |
 | Reproducibility | Integrated automation plus green 87-test CI and validators | **PASS** |
-| Teardown | Evidence-safe exact destroy remains to be run | **OPEN** |
+| Teardown | Helm/public Service removed; exact three-delete plan separately applied; AKS/node resource group absent; shared services preserved; zero-resource state reconciled | **PASS** |
 
-No earlier Stage 1 claim was promoted to live evidence. Phase 9 becomes PASS
-only after the teardown row is demonstrated and integrated.
+No earlier Stage 1 claim or interrupted experiment was promoted to live
+evidence. All fourteen ACT-9 rows are demonstrated and Phase 9 is **PASS**.

@@ -2,7 +2,7 @@
 
 Date: 2026-10-04 UTC
 
-Decision state: **APPROVED D2AS_V4 ENVELOPE APPLIED; CONTROLLED TEARDOWN PENDING**
+Decision state: **APPROVED D2AS_V4 ENVELOPE APPLIED, DEMONSTRATED, AND DESTROYED**
 
 The operator approved this exact resource envelope and later approved the
 single substitution from `Standard_D2as_v5` to `Standard_D2as_v4` after Azure
@@ -191,10 +191,32 @@ shared ACR and external Function remain present, and a fresh Phase 9 plan again
 shows only the original three creates. Evidence of that verification is an
 ACT-9 requirement.
 
+## Completed teardown
+
+The Helm release and `arp-phase9` namespace were removed first, including the
+public application Service. Trusted-main destroy plan
+[`37253535368`](https://github.com/amir-cs-dev/azure-reliability-platform/actions/runs/37253535368)
+used Terraform 1.16.3, source `bc980c450401c03371b86c8aa139c5fbbbd729a9`,
+state lineage `3fb12007-bf85-15a3-843c-a31a6157b798` serial 3, and contained
+exactly three deletes with no create, update, or replacement. Separate apply
+[`37253751373`](https://github.com/amir-cs-dev/azure-reliability-platform/actions/runs/37253751373)
+reported `0 added, 0 changed, 3 destroyed`.
+
+The cluster and managed node resource group are absent. The existing ACR,
+Container App, and external Function survived; the Function is running against
+its restored Container Apps target and continued returning healthy HTTP 200
+results with successful persistence. The isolated state retains its lineage at
+serial 5 and tracks zero managed resources. Read-only reconciliation plan
+[`37254291825`](https://github.com/amir-cs-dev/azure-reliability-platform/actions/runs/37254291825)
+then proposed only the original three creates and was not applied. The
+temporary compute, load balancer, public IPs, disk, and managed node resource
+group no longer incur Phase 9 lab cost.
+
 ## Approval boundary
 
 No command in Stage 1 created AKS or another materially billable Phase 9
 resource. The operator subsequently approved this envelope and only the
 D2as_v4 compute substitution. The fresh trusted-`main` plan passed that audit
-and was separately applied. Further apply is prohibited except for the
-reviewed exact-plan teardown documented above.
+and was separately applied. The reviewed exact-plan teardown is complete. Any
+future recreation is a new consequential apply and requires a fresh
+current-main plan and explicit operator approval.

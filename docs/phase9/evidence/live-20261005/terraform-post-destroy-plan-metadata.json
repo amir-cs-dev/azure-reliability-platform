@@ -1,0 +1,76 @@
+{
+  "artifact_name": "phase9-terraform-plan-37254291825",
+  "backend": {
+    "container": "tfstate",
+    "key": "phase9.terraform.tfstate",
+    "lineage": "3fb12007-bf85-15a3-843c-a31a6157b798",
+    "resource_group": "rg-arp-tfstate-wus3",
+    "serial": 5,
+    "storage_account": "starptf3e6c8737fb3a44be",
+    "type": "azurerm"
+  },
+  "created_at": "2026-10-05T02:12:31.454951+00:00",
+  "plan": {
+    "files": {
+      "plan.tfplan": {
+        "sha256": "bf3e1010037b5a7f729f4fd829021c8a95c5e3a41480287d210a0a43b2d42ddc",
+        "size_bytes": 8762
+      },
+      "plan.txt": {
+        "sha256": "d8a98ba01e76ac03469d41c06b73b3bdad0371550b44d59ebc95aa096a383a36",
+        "size_bytes": 7337
+      }
+    },
+    "summary": {
+      "affected_resources": [
+        {
+          "actions": [
+            "create"
+          ],
+          "address": "azurerm_kubernetes_cluster.phase9"
+        },
+        {
+          "actions": [
+            "create"
+          ],
+          "address": "azurerm_role_assignment.aks_acr_pull"
+        },
+        {
+          "actions": [
+            "create"
+          ],
+          "address": "azurerm_role_assignment.operator_cluster_admin"
+        }
+      ],
+      "counts": {
+        "create": 3,
+        "delete": 0,
+        "read": 0,
+        "replace": 0,
+        "update": 0
+      }
+    }
+  },
+  "repository": "amir-cs-dev/azure-reliability-platform",
+  "schema_version": 1,
+  "source": {
+    "branch": "main",
+    "event": "workflow_dispatch",
+    "infra_tree": "ddf19d3463f2b68685bfdf55582417ec9b92be83",
+    "ref": "refs/heads/main",
+    "sha": "bc980c450401c03371b86c8aa139c5fbbbd729a9"
+  },
+  "terraform": {
+    "operation": "normal",
+    "plan_exit_code": 2,
+    "version": "1.16.3"
+  },
+  "variables": {
+    "image_tag": "e531acdbcc1ef3b85e46e213b4130acaba31ef4b"
+  },
+  "workflow": {
+    "run_attempt": "1",
+    "run_id": "37254291825",
+    "workflow_ref": "amir-cs-dev/azure-reliability-platform/.github/workflows/phase9-terraform-plan.yml@refs/heads/main"
+  }
+}

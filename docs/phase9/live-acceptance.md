@@ -2,8 +2,7 @@
 
 Date: 2026-10-05 UTC
 
-Verdict: **LIVE PROVISIONING, OBSERVABILITY, FAULT, ROLLING UPDATE, ROLLBACK,
-AND RECOVERY PASS; CONTROLLED TEARDOWN REMAINS OPEN**
+Verdict: **ACT-9 PASS — 14/14 REQUIREMENTS**
 
 Only the complete final run under
 [`evidence/live-20261005`](evidence/live-20261005/) is ACT-9 acceptance
@@ -176,7 +175,74 @@ with successful persistence. See
 [`external-checker-restored-target.json`](evidence/live-20261005/external-checker-restored-target.json)
 and [`external-checker-post-cleanup.json`](evidence/live-20261005/external-checker-post-cleanup.json).
 
-## ACT-9 matrix before teardown
+## Controlled teardown and reconciliation
+
+After this complete evidence chain was merged through PR #26, the guarded
+teardown removed the Helm release, `arp-phase9` namespace, and public
+application Service before infrastructure deletion. Kubernetes confirmed the
+namespace was absent.
+
+The first destroy-plan run
+[`37253330559`](https://github.com/amir-cs-dev/azure-reliability-platform/actions/runs/37253330559)
+failed before creating an artifact because the read-only plan identity lacked
+the AzureRM provider's required
+`Microsoft.ContainerService/managedClusters/listClusterUserCredential/action`
+while refreshing the live cluster. It made no infrastructure change. The
+identity received only the built-in `Azure Kubernetes Service Cluster User
+Role`, scoped to this temporary cluster. That role grants cluster read and the
+single credential-list action; it did not grant Contributor or any wider
+scope. Its assignment disappeared with the cluster, as shown in
+[`plan-identity-destroy-read-scope.json`](evidence/live-20261005/plan-identity-destroy-read-scope.json).
+
+Fresh trusted-main destroy plan
+[`37253535368`](https://github.com/amir-cs-dev/azure-reliability-platform/actions/runs/37253535368)
+used source `bc980c450401c03371b86c8aa139c5fbbbd729a9`, Terraform 1.16.3,
+the unchanged infrastructure tree, and state lineage
+`3fb12007-bf85-15a3-843c-a31a6157b798` serial 3. Its artifact hashes were
+independently verified. The exact reviewed scope was:
+
+```text
+Plan: 0 to add, 0 to change, 3 to destroy.
+```
+
+Only `azurerm_kubernetes_cluster.phase9`,
+`azurerm_role_assignment.aks_acr_pull`, and
+`azurerm_role_assignment.operator_cluster_admin` were affected. There was no
+shared-resource delete, create, update, or replacement. See
+[`terraform-destroy-plan-metadata.json`](evidence/live-20261005/terraform-destroy-plan-metadata.json).
+
+Separate manual apply
+[`37253751373`](https://github.com/amir-cs-dev/azure-reliability-platform/actions/runs/37253751373)
+required literal `APPLY`, reverified the exact current-main source, branch,
+artifact hashes, age, and state lineage/serial, and reported `0 added, 0
+changed, 3 destroyed`. The resulting state retained the same lineage at serial
+5 and contains zero managed resources. Evidence:
+
+- [`terraform-destroy-apply-metadata.json`](evidence/live-20261005/terraform-destroy-apply-metadata.json);
+- [`terraform-state-after-destroy.json`](evidence/live-20261005/terraform-state-after-destroy.json);
+- [`aks-after-destroy.json`](evidence/live-20261005/aks-after-destroy.json);
+- [`node-resource-group-after-destroy.json`](evidence/live-20261005/node-resource-group-after-destroy.json).
+
+The existing ACR and Container App remain provisioned successfully, and the
+external Function remains enabled and running. Its `TARGET_URL` is the
+original HTTPS Container Apps `/health` URL, and five natural post-destroy
+timer executions remained healthy HTTP 200 with zero consecutive failures and
+successful persistence. Evidence:
+
+- [`shared-acr-after-destroy.json`](evidence/live-20261005/shared-acr-after-destroy.json);
+- [`shared-container-app-after-destroy.json`](evidence/live-20261005/shared-container-app-after-destroy.json);
+- [`shared-function-after-destroy.json`](evidence/live-20261005/shared-function-after-destroy.json);
+- [`external-checker-target-after-destroy.json`](evidence/live-20261005/external-checker-target-after-destroy.json);
+- [`external-checker-post-destroy.json`](evidence/live-20261005/external-checker-post-destroy.json).
+
+Finally, normal plan
+[`37254291825`](https://github.com/amir-cs-dev/azure-reliability-platform/actions/runs/37254291825)
+read state serial 5 and proposed exactly the original three creates with zero
+update, replace, or delete. It was retained as reconciliation evidence and was
+not applied. See
+[`terraform-post-destroy-plan-metadata.json`](evidence/live-20261005/terraform-post-destroy-plan-metadata.json).
+
+## Final ACT-9 matrix
 
 | ACT-9 requirement | Live evidence | Result |
 |---|---|---|
@@ -193,9 +259,7 @@ and [`external-checker-post-cleanup.json`](evidence/live-20261005/external-check
 | Rollback | Actual rollback to revision 5 created deployed revision 7 | **PASS** |
 | Monitoring/alerts/recovery | Prometheus fire/recover, Alertmanager route/clear, Function open/recover | **PASS** |
 | Reproducibility | Integrated scripts/chart/Terraform plus green 87-test CI and validators | **PASS** |
-| Teardown | Evidence-safe destroy has not yet run | **OPEN** |
+| Teardown | Helm/public Service removed; exact three-delete plan applied; AKS/node resource group absent; shared services preserved; state reconciled empty | **PASS** |
 
-Phase 9 remains OPEN until the Helm workloads and LoadBalancer are removed,
-an exact current-main destroy plan deletes only the three isolated Phase 9
-resources, that plan is separately applied, and shared-resource survival plus
-zero-resource state are demonstrated.
+All fourteen ACT-9 requirements are demonstrated. Phase 9 is **PASS**. Phase 10
+has not begun.
