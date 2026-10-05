@@ -4,6 +4,9 @@ This is the entry point for an unfamiliar reviewer. The default path is local,
 does not need Azure credentials, does not modify the live platform, and does not
 recreate the temporary AKS lab.
 
+The path was independently completed from a clean clone of integrated
+`origin/main`; see the [exact Phase 10 command/result record](phase10/fresh-clone-review.md).
+
 ## Prerequisites
 
 - Git

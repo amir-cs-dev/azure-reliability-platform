@@ -1,9 +1,35 @@
 # Final authoritative acceptance audit
 
 This audit consolidates, rather than replaces, the phase-specific evidence.
-Phase 10 remains **OPEN** until the documentation/reviewer foundation is merged
-and the mandatory reproduction is executed from a new clone of current
-`origin/main`. The tables below intentionally do not predeclare ACT-10 PASS.
+The documentation/reviewer foundation merged through green
+[PR #28](https://github.com/amir-cs-dev/azure-reliability-platform/pull/28)
+at `a869f849d87271ed310cd07232b7e7e9be313e35`. The mandatory reproduction
+then succeeded from a new clone whose `HEAD` exactly equaled that integrated
+`origin/main`. ACT-10 and every cross-cutting domain are **PASS**.
+
+## Phase 10 reviewer result
+
+The complete command/result record is [fresh-clone reviewer
+evidence](phase10/fresh-clone-review.md). It proves:
+
+- 8 focused application/fault tests, 6 focused checker tests, and all 87 tests;
+- normal `/`, `/health`, and `/ready` behavior plus two protocol-distinct
+  configuration-only faults through Docker;
+- both Docker image builds and Function packaging;
+- both Terraform roots and 21 rendered Kubernetes resources;
+- Prometheus rules/configuration, Alertmanager, Grafana, Actionlint, and every
+  relative documentation target;
+- a 37-commit history-aware secret scan with no leaks;
+- complete linked deployment, rollback, Phase 9, teardown, cost, security, and
+  cold-review answers; and
+- a clean clone with no test containers/images left afterward.
+
+The legacy scheduler discrepancy was also closed before the reviewer run. Its
+top-level Azure resource had said `Running` while all eight revisions were
+inactive/stopped with zero replicas and traffic. The app was explicitly stopped
+through the Container Apps REST operation, the production workflow/verifier no
+longer touches it, and its unused deployer role was removed. The Azure Function
+remains the only scheduler.
 
 ## Final test matrix
 
@@ -163,7 +189,7 @@ These answers use only version-controlled repository content.
 | ACT-7 | PASS | [Incident #2 correlated observability](incidents/incident-002.md) | None |
 | ACT-8 | PASS | [Rollback and verifier remediation](incidents/incident-002.md#recovery-and-rollback) | None |
 | ACT-9 | PASS | [Complete live chain and teardown](phase9/live-acceptance.md) | None |
-| ACT-10 | **PENDING** | Documentation and review tooling on the Phase 10 branch | Fresh-clone test must run from integrated `origin/main` |
+| ACT-10 | PASS | [Integrated-main fresh-clone reviewer evidence](phase10/fresh-clone-review.md) and cold-review answers above | None |
 
 ## Cross-cutting audit
 
@@ -176,9 +202,8 @@ These answers use only version-controlled repository content.
 | Testing | PASS | 87-test matrix plus static/Docker gates above |
 | Reliability | PASS | Reliability matrix above and phase evidence |
 | Observability | PASS | Persistent/temporary observability matrix above |
-| Reproducibility | **PENDING** | Documented local path exists; integrated-main fresh clone not yet run |
+| Reproducibility | PASS | [Fresh clone of integrated `origin/main`](phase10/fresh-clone-review.md) completed every safe reviewer gate |
 | Cost controls/documentation | PASS | [Cost and safe teardown](cost-and-teardown.md) |
 
-Phase 10 and the complete project may be marked PASS only after the two pending
-rows are replaced with exact successful fresh-clone evidence and the resulting
-final audit is integrated through green CI.
+Every ACT and cross-cutting row passes. The final audit is eligible for its
+green-CI integration and post-merge verification.
