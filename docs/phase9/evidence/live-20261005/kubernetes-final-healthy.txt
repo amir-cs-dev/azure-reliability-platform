@@ -1,0 +1,21 @@
+NAME                                     READY   UP-TO-DATE   AVAILABLE   AGE    CONTAINERS           IMAGES                                                                                                                       SELECTOR
+deployment.apps/arp-alertmanager         1/1     1            1           4h7m   alertmanager         prom/alertmanager:v0.29.0                                                                                                    app.kubernetes.io/name=arp-alertmanager
+deployment.apps/arp-api                  2/2     2            2           4h7m   api                  arp3e6c8737fb3a44be8477.azurecr.io/reliability-api@sha256:e4eb809c41def75713defc41afb8230b3d832dc5d17b49c2bd444df5808c0418   app.kubernetes.io/instance=arp-phase9,app.kubernetes.io/name=arp-api
+deployment.apps/arp-grafana              1/1     1            1           4h7m   grafana              grafana/grafana:12.3.0                                                                                                       app.kubernetes.io/name=arp-grafana
+deployment.apps/arp-kube-state-metrics   1/1     1            1           4h7m   kube-state-metrics   registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.17.0                                                                app.kubernetes.io/name=arp-kube-state-metrics
+deployment.apps/arp-prometheus           1/1     1            1           4h7m   prometheus           prom/prometheus:v3.7.3                                                                                                       app.kubernetes.io/name=arp-prometheus
+
+NAME                                          READY   STATUS    RESTARTS   AGE     IP             NODE                             NOMINATED NODE   READINESS GATES
+pod/arp-alertmanager-5578bfd855-t8p6p         1/1     Running   0          4h7m    10.244.0.14    aks-system-25788750-vmss000000   <none>           <none>
+pod/arp-api-7857f48c4c-hn7ql                  1/1     Running   0          3m45s   10.244.0.132   aks-system-25788750-vmss000000   <none>           <none>
+pod/arp-api-7857f48c4c-qpkwj                  1/1     Running   0          3m51s   10.244.0.48    aks-system-25788750-vmss000000   <none>           <none>
+pod/arp-grafana-548db9f7bb-v49zx              1/1     Running   0          4h7m    10.244.0.235   aks-system-25788750-vmss000000   <none>           <none>
+pod/arp-kube-state-metrics-7c68f46cfd-88wtx   1/1     Running   0          4h7m    10.244.0.60    aks-system-25788750-vmss000000   <none>           <none>
+pod/arp-prometheus-744878b798-r6dxx           1/1     Running   0          4h7m    10.244.0.0     aks-system-25788750-vmss000000   <none>           <none>
+
+NAME                             TYPE           CLUSTER-IP      EXTERNAL-IP    PORT(S)        AGE    SELECTOR
+service/arp-alertmanager         ClusterIP      10.240.21.7     <none>         9093/TCP       4h7m   app.kubernetes.io/name=arp-alertmanager
+service/arp-api                  LoadBalancer   10.240.95.171   4.236.60.185   80:30768/TCP   4h7m   app.kubernetes.io/instance=arp-phase9,app.kubernetes.io/name=arp-api
+service/arp-grafana              ClusterIP      10.240.158.22   <none>         3000/TCP       4h7m   app.kubernetes.io/name=arp-grafana
+service/arp-kube-state-metrics   ClusterIP      10.240.72.220   <none>         8080/TCP       4h7m   app.kubernetes.io/name=arp-kube-state-metrics
+service/arp-prometheus           ClusterIP      10.240.175.57   <none>         9090/TCP       4h7m   app.kubernetes.io/name=arp-prometheus

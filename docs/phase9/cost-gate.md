@@ -2,15 +2,17 @@
 
 Date: 2026-10-04 UTC
 
-Decision state: **APPROVED WITH D2AS_V4 COMPUTE SUBSTITUTION; FRESH PLAN REQUIRED**
+Decision state: **APPROVED D2AS_V4 ENVELOPE APPLIED; CONTROLLED TEARDOWN PENDING**
 
 The operator approved this exact resource envelope and later approved the
 single substitution from `Standard_D2as_v5` to `Standard_D2as_v4` after Azure
 rejected the minimum DASv5-family quota request. No other architecture or cost
 gate changed. The D2as_v4 SKU is available in West US 3, has 2 vCPU and 8 GiB,
-and its DASv4-family quota is 10 vCPUs with zero currently consumed. Apply is
-still prohibited until a fresh trusted-main D2as_v4 plan passes the complete
-material-envelope audit. See the [Stage 2 preflight](stage2-preflight.md).
+and its DASv4-family quota is 10 vCPUs with zero consumed at preflight. Fresh
+trusted-main plan `37235069628` passed the complete material-envelope audit and
+separate apply `37235364607` created only the approved resources. See the
+[Stage 2 preflight](stage2-preflight.md) and [live acceptance
+report](live-acceptance.md).
 
 ## Terraform plan summary
 
@@ -193,5 +195,6 @@ ACT-9 requirement.
 
 No command in Stage 1 created AKS or another materially billable Phase 9
 resource. The operator subsequently approved this envelope and only the
-D2as_v4 compute substitution. Apply remains prohibited until a fresh
-trusted-`main` D2as_v4 plan passes the same material-envelope audit.
+D2as_v4 compute substitution. The fresh trusted-`main` plan passed that audit
+and was separately applied. Further apply is prohibited except for the
+reviewed exact-plan teardown documented above.

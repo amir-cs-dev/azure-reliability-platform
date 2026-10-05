@@ -1,0 +1,25 @@
+{
+  "agentPools": [
+    {
+      "count": 1,
+      "enableAutoScaling": false,
+      "mode": "System",
+      "name": "system",
+      "osDiskSizeGB": 30,
+      "vmSize": "Standard_D2as_v4"
+    }
+  ],
+  "azureRbac": true,
+  "id": "/subscriptions/3e6c8737-fb3a-44be-8477-45e2f66a45f5/resourcegroups/rg-arp-app-wus3/providers/Microsoft.ContainerService/managedClusters/aks-arp-phase9-wus3",
+  "kubernetesVersion": "1.35",
+  "localAccountsDisabled": true,
+  "nodeResourceGroup": "rg-arp-phase9-nodes-wus3",
+  "oidcIssuerEnabled": true,
+  "powerState": "Running",
+  "provisioningState": "Succeeded",
+  "sku": {
+    "name": "Base",
+    "tier": "Free"
+  },
+  "workloadIdentityEnabled": true
+}

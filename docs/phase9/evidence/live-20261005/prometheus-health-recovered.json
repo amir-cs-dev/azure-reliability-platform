@@ -1,0 +1,1 @@
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"arp_health_status","instance":"10.244.0.48:8000","job":"arp-api"},"value":[1791164667.089,"1"]},{"metric":{"__name__":"arp_health_status","instance":"10.244.0.132:8000","job":"arp-api"},"value":[1791164667.089,"1"]}]}}

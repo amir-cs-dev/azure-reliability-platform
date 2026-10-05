@@ -1,0 +1,16 @@
+{
+  "completed_at": "2026-10-05T01:44:44.624261+00:00",
+  "latency_ms": {
+    "average": 51.07,
+    "maximum": 5005.31,
+    "minimum": 10.18
+  },
+  "requests": 986,
+  "started_at": "2026-10-05T01:39:44.423241+00:00",
+  "status_counts": {
+    "200": 480,
+    "500": 486,
+    "request_error": 20
+  },
+  "target": "http://4.236.60.185/health"
+}

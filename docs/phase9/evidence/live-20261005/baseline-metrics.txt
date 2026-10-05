@@ -1,0 +1,162 @@
+# HELP python_gc_objects_collected_total Objects collected during gc
+# TYPE python_gc_objects_collected_total counter
+python_gc_objects_collected_total{generation="0"} 713.0
+python_gc_objects_collected_total{generation="1"} 21.0
+python_gc_objects_collected_total{generation="2"} 2.0
+# HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
+# TYPE python_gc_objects_uncollectable_total counter
+python_gc_objects_uncollectable_total{generation="0"} 0.0
+python_gc_objects_uncollectable_total{generation="1"} 0.0
+python_gc_objects_uncollectable_total{generation="2"} 0.0
+# HELP python_gc_collections_total Number of times this generation was collected
+# TYPE python_gc_collections_total counter
+python_gc_collections_total{generation="0"} 138.0
+python_gc_collections_total{generation="1"} 12.0
+python_gc_collections_total{generation="2"} 1.0
+# HELP python_info Python platform information
+# TYPE python_info gauge
+python_info{implementation="CPython",major="3",minor="14",patchlevel="8",version="3.14.8"} 1.0
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 1.40406784e+08
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 5.5836672e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.79115075475e+09
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 31.23
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 10.0
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP arp_http_requests_total Completed HTTP requests handled by the application.
+# TYPE arp_http_requests_total counter
+arp_http_requests_total{method="GET",path="/ready",status_code="200"} 2707.0
+arp_http_requests_total{method="GET",path="/health",status_code="200"} 1356.0
+arp_http_requests_total{method="POST",path="other",status_code="404"} 7.0
+arp_http_requests_total{method="POST",path="/",status_code="405"} 2.0
+arp_http_requests_total{method="GET",path="other",status_code="404"} 44.0
+arp_http_requests_total{method="GET",path="/",status_code="200"} 7.0
+arp_http_requests_total{method="PRI",path="other",status_code="404"} 1.0
+# HELP arp_http_requests_created Completed HTTP requests handled by the application.
+# TYPE arp_http_requests_created gauge
+arp_http_requests_created{method="GET",path="/ready",status_code="200"} 1.7911507608142684e+09
+arp_http_requests_created{method="GET",path="/health",status_code="200"} 1.791150764801926e+09
+arp_http_requests_created{method="POST",path="other",status_code="404"} 1.7911517697148118e+09
+arp_http_requests_created{method="POST",path="/",status_code="405"} 1.7911517722574275e+09
+arp_http_requests_created{method="GET",path="other",status_code="404"} 1.791151776556926e+09
+arp_http_requests_created{method="GET",path="/",status_code="200"} 1.7911525532083404e+09
+arp_http_requests_created{method="PRI",path="other",status_code="404"} 1.791154274389296e+09
+# HELP arp_http_request_duration_seconds Application HTTP request duration in seconds.
+# TYPE arp_http_request_duration_seconds histogram
+arp_http_request_duration_seconds_bucket{le="0.005",method="GET",path="/ready"} 2707.0
+arp_http_request_duration_seconds_bucket{le="0.01",method="GET",path="/ready"} 2707.0
+arp_http_request_duration_seconds_bucket{le="0.025",method="GET",path="/ready"} 2707.0
+arp_http_request_duration_seconds_bucket{le="0.05",method="GET",path="/ready"} 2707.0
+arp_http_request_duration_seconds_bucket{le="0.1",method="GET",path="/ready"} 2707.0
+arp_http_request_duration_seconds_bucket{le="0.25",method="GET",path="/ready"} 2707.0
+arp_http_request_duration_seconds_bucket{le="0.5",method="GET",path="/ready"} 2707.0
+arp_http_request_duration_seconds_bucket{le="1.0",method="GET",path="/ready"} 2707.0
+arp_http_request_duration_seconds_bucket{le="2.5",method="GET",path="/ready"} 2707.0
+arp_http_request_duration_seconds_bucket{le="5.0",method="GET",path="/ready"} 2707.0
+arp_http_request_duration_seconds_bucket{le="+Inf",method="GET",path="/ready"} 2707.0
+arp_http_request_duration_seconds_count{method="GET",path="/ready"} 2707.0
+arp_http_request_duration_seconds_sum{method="GET",path="/ready"} 1.5392522419781471
+arp_http_request_duration_seconds_bucket{le="0.005",method="GET",path="/health"} 1356.0
+arp_http_request_duration_seconds_bucket{le="0.01",method="GET",path="/health"} 1356.0
+arp_http_request_duration_seconds_bucket{le="0.025",method="GET",path="/health"} 1356.0
+arp_http_request_duration_seconds_bucket{le="0.05",method="GET",path="/health"} 1356.0
+arp_http_request_duration_seconds_bucket{le="0.1",method="GET",path="/health"} 1356.0
+arp_http_request_duration_seconds_bucket{le="0.25",method="GET",path="/health"} 1356.0
+arp_http_request_duration_seconds_bucket{le="0.5",method="GET",path="/health"} 1356.0
+arp_http_request_duration_seconds_bucket{le="1.0",method="GET",path="/health"} 1356.0
+arp_http_request_duration_seconds_bucket{le="2.5",method="GET",path="/health"} 1356.0
+arp_http_request_duration_seconds_bucket{le="5.0",method="GET",path="/health"} 1356.0
+arp_http_request_duration_seconds_bucket{le="+Inf",method="GET",path="/health"} 1356.0
+arp_http_request_duration_seconds_count{method="GET",path="/health"} 1356.0
+arp_http_request_duration_seconds_sum{method="GET",path="/health"} 0.812101411022013
+arp_http_request_duration_seconds_bucket{le="0.005",method="POST",path="other"} 7.0
+arp_http_request_duration_seconds_bucket{le="0.01",method="POST",path="other"} 7.0
+arp_http_request_duration_seconds_bucket{le="0.025",method="POST",path="other"} 7.0
+arp_http_request_duration_seconds_bucket{le="0.05",method="POST",path="other"} 7.0
+arp_http_request_duration_seconds_bucket{le="0.1",method="POST",path="other"} 7.0
+arp_http_request_duration_seconds_bucket{le="0.25",method="POST",path="other"} 7.0
+arp_http_request_duration_seconds_bucket{le="0.5",method="POST",path="other"} 7.0
+arp_http_request_duration_seconds_bucket{le="1.0",method="POST",path="other"} 7.0
+arp_http_request_duration_seconds_bucket{le="2.5",method="POST",path="other"} 7.0
+arp_http_request_duration_seconds_bucket{le="5.0",method="POST",path="other"} 7.0
+arp_http_request_duration_seconds_bucket{le="+Inf",method="POST",path="other"} 7.0
+arp_http_request_duration_seconds_count{method="POST",path="other"} 7.0
+arp_http_request_duration_seconds_sum{method="POST",path="other"} 0.0029322090003915946
+arp_http_request_duration_seconds_bucket{le="0.005",method="POST",path="/"} 2.0
+arp_http_request_duration_seconds_bucket{le="0.01",method="POST",path="/"} 2.0
+arp_http_request_duration_seconds_bucket{le="0.025",method="POST",path="/"} 2.0
+arp_http_request_duration_seconds_bucket{le="0.05",method="POST",path="/"} 2.0
+arp_http_request_duration_seconds_bucket{le="0.1",method="POST",path="/"} 2.0
+arp_http_request_duration_seconds_bucket{le="0.25",method="POST",path="/"} 2.0
+arp_http_request_duration_seconds_bucket{le="0.5",method="POST",path="/"} 2.0
+arp_http_request_duration_seconds_bucket{le="1.0",method="POST",path="/"} 2.0
+arp_http_request_duration_seconds_bucket{le="2.5",method="POST",path="/"} 2.0
+arp_http_request_duration_seconds_bucket{le="5.0",method="POST",path="/"} 2.0
+arp_http_request_duration_seconds_bucket{le="+Inf",method="POST",path="/"} 2.0
+arp_http_request_duration_seconds_count{method="POST",path="/"} 2.0
+arp_http_request_duration_seconds_sum{method="POST",path="/"} 0.0006971019997763506
+arp_http_request_duration_seconds_bucket{le="0.005",method="GET",path="other"} 44.0
+arp_http_request_duration_seconds_bucket{le="0.01",method="GET",path="other"} 44.0
+arp_http_request_duration_seconds_bucket{le="0.025",method="GET",path="other"} 44.0
+arp_http_request_duration_seconds_bucket{le="0.05",method="GET",path="other"} 44.0
+arp_http_request_duration_seconds_bucket{le="0.1",method="GET",path="other"} 44.0
+arp_http_request_duration_seconds_bucket{le="0.25",method="GET",path="other"} 44.0
+arp_http_request_duration_seconds_bucket{le="0.5",method="GET",path="other"} 44.0
+arp_http_request_duration_seconds_bucket{le="1.0",method="GET",path="other"} 44.0
+arp_http_request_duration_seconds_bucket{le="2.5",method="GET",path="other"} 44.0
+arp_http_request_duration_seconds_bucket{le="5.0",method="GET",path="other"} 44.0
+arp_http_request_duration_seconds_bucket{le="+Inf",method="GET",path="other"} 44.0
+arp_http_request_duration_seconds_count{method="GET",path="other"} 44.0
+arp_http_request_duration_seconds_sum{method="GET",path="other"} 0.014307140999335388
+arp_http_request_duration_seconds_bucket{le="0.005",method="GET",path="/"} 7.0
+arp_http_request_duration_seconds_bucket{le="0.01",method="GET",path="/"} 7.0
+arp_http_request_duration_seconds_bucket{le="0.025",method="GET",path="/"} 7.0
+arp_http_request_duration_seconds_bucket{le="0.05",method="GET",path="/"} 7.0
+arp_http_request_duration_seconds_bucket{le="0.1",method="GET",path="/"} 7.0
+arp_http_request_duration_seconds_bucket{le="0.25",method="GET",path="/"} 7.0
+arp_http_request_duration_seconds_bucket{le="0.5",method="GET",path="/"} 7.0
+arp_http_request_duration_seconds_bucket{le="1.0",method="GET",path="/"} 7.0
+arp_http_request_duration_seconds_bucket{le="2.5",method="GET",path="/"} 7.0
+arp_http_request_duration_seconds_bucket{le="5.0",method="GET",path="/"} 7.0
+arp_http_request_duration_seconds_bucket{le="+Inf",method="GET",path="/"} 7.0
+arp_http_request_duration_seconds_count{method="GET",path="/"} 7.0
+arp_http_request_duration_seconds_sum{method="GET",path="/"} 0.0043172130008315435
+arp_http_request_duration_seconds_bucket{le="0.005",method="PRI",path="other"} 1.0
+arp_http_request_duration_seconds_bucket{le="0.01",method="PRI",path="other"} 1.0
+arp_http_request_duration_seconds_bucket{le="0.025",method="PRI",path="other"} 1.0
+arp_http_request_duration_seconds_bucket{le="0.05",method="PRI",path="other"} 1.0
+arp_http_request_duration_seconds_bucket{le="0.1",method="PRI",path="other"} 1.0
+arp_http_request_duration_seconds_bucket{le="0.25",method="PRI",path="other"} 1.0
+arp_http_request_duration_seconds_bucket{le="0.5",method="PRI",path="other"} 1.0
+arp_http_request_duration_seconds_bucket{le="1.0",method="PRI",path="other"} 1.0
+arp_http_request_duration_seconds_bucket{le="2.5",method="PRI",path="other"} 1.0
+arp_http_request_duration_seconds_bucket{le="5.0",method="PRI",path="other"} 1.0
+arp_http_request_duration_seconds_bucket{le="+Inf",method="PRI",path="other"} 1.0
+arp_http_request_duration_seconds_count{method="PRI",path="other"} 1.0
+arp_http_request_duration_seconds_sum{method="PRI",path="other"} 0.00041930200040951604
+# HELP arp_http_request_duration_seconds_created Application HTTP request duration in seconds.
+# TYPE arp_http_request_duration_seconds_created gauge
+arp_http_request_duration_seconds_created{method="GET",path="/ready"} 1.79115076081431e+09
+arp_http_request_duration_seconds_created{method="GET",path="/health"} 1.79115076480196e+09
+arp_http_request_duration_seconds_created{method="POST",path="other"} 1.7911517697148354e+09
+arp_http_request_duration_seconds_created{method="POST",path="/"} 1.7911517722574515e+09
+arp_http_request_duration_seconds_created{method="GET",path="other"} 1.791151776556949e+09
+arp_http_request_duration_seconds_created{method="GET",path="/"} 1.7911525532083638e+09
+arp_http_request_duration_seconds_created{method="PRI",path="other"} 1.7911542743893318e+09
+# HELP arp_health_status Current semantic health status: 1 healthy, 0 controlled fault.
+# TYPE arp_health_status gauge
+arp_health_status 1.0
+# HELP arp_application_info Immutable application revision information.
+# TYPE arp_application_info gauge
+arp_application_info{version="phase9-360a67b86d9e"} 1.0

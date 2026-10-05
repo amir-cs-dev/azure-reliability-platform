@@ -139,17 +139,14 @@ ACT-6 is closed by the [Phase 6 CI/CD acceptance evidence](docs/ci-cd/phase6-acc
 
 ### Kubernetes and deeper observability
 
-Phase 9 Stage 1 is implemented and statically validated in the [Phase 9
-package](docs/phase9/README.md). It defines an isolated one-node AKS lab,
-digest-pinned Helm deployment, application metrics, in-cluster Prometheus,
-Grafana, Alertmanager, kube-state-metrics, a real rolling-failure/rollback
-experiment, and controlled teardown. The [resource and cost
-gate](docs/phase9/cost-gate.md) is approved. No AKS resource has been applied
-and Phase 9 remains OPEN. The [Stage 2
-preflight](docs/phase9/stage2-preflight.md) records Azure's rejection of the
-minimum DASv5-family quota increase and the operator's subsequent approval of
-the single `Standard_D2as_v4` substitution. A fresh trusted-main plan must pass
-the unchanged material-envelope audit before apply.
+Phase 9's one-node AKS lab and complete reliability chain are live-demonstrated
+in the [Phase 9 package](docs/phase9/README.md) and [acceptance
+evidence](docs/phase9/live-acceptance.md). The reviewed D2as_v4 plan created
+only the isolated cluster and two role assignments. The digest-pinned Helm
+deployment, probes, application metrics, in-cluster Prometheus/Grafana/
+Alertmanager/kube-state-metrics, external Function checker, controlled fault,
+real rolling update, actual rollback, alerts, and recovery all pass. Phase 9
+remains OPEN only until the evidence-safe exact-plan teardown is demonstrated.
 
 ## Technology Stack
 
@@ -183,7 +180,7 @@ CI, application deployment, Terraform planning, and operator-approved Terraform 
 
 **Remaining authoritative work**
 
-* Live AKS provisioning, deployment, reliability experiment, evidence, and teardown.
+* Complete the reviewed Phase 9 teardown and preservation audit.
 
 **Planned**
 

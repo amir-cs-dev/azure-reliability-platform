@@ -1,0 +1,1 @@
+{"deployment":{"faultMode":"http_500","revision":"phase9-http500-20261005T013944Z"},"image":{"digest":"sha256:e4eb809c41def75713defc41afb8230b3d832dc5d17b49c2bd444df5808c0418","repository":"arp3e6c8737fb3a44be8477.azurecr.io/reliability-api"}}

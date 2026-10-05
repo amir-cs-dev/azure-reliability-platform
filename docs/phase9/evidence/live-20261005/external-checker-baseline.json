@@ -1,0 +1,14 @@
+[
+  {
+    "Message": "{\"event\": \"scheduled_monitor_started\", \"past_due\": false, \"target\": \"http://4.236.60.185/health\", \"timestamp\": \"2026-10-05T01:39:00.133968+00:00\"}",
+    "SeverityLevel": "1",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-05T01:39:00.1543202Z"
+  },
+  {
+    "Message": "{\"consecutive_failures\": 0, \"event\": \"scheduled_monitor_completed\", \"healthy\": true, \"latency_ms\": 16.62, \"lifecycle_event\": null, \"persistence\": \"succeeded\", \"status_code\": 200, \"timestamp\": \"2026-10-05T01:39:00.588498+00:00\"}",
+    "SeverityLevel": "1",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-05T01:39:00.7357589Z"
+  }
+]

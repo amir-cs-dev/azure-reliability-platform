@@ -1,0 +1,17 @@
+[
+  {
+    "Message": "{\"consecutive_failures\": 0, \"event\": \"scheduled_monitor_completed\", \"healthy\": true, \"latency_ms\": 7.81, \"lifecycle_event\": null, \"persistence\": \"succeeded\", \"status_code\": 200, \"timestamp\": \"2026-10-05T01:44:00.117109+00:00\"}",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-05T01:44:00.745921Z"
+  },
+  {
+    "Message": "{\"consecutive_failures\": 0, \"event\": \"scheduled_monitor_completed\", \"healthy\": true, \"latency_ms\": 5.99, \"lifecycle_event\": null, \"persistence\": \"succeeded\", \"status_code\": 200, \"timestamp\": \"2026-10-05T01:45:00.123738+00:00\"}",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-05T01:45:00.2687916Z"
+  },
+  {
+    "Message": "{\"consecutive_failures\": 0, \"event\": \"scheduled_monitor_completed\", \"healthy\": true, \"latency_ms\": 54.01, \"lifecycle_event\": null, \"persistence\": \"succeeded\", \"status_code\": 200, \"timestamp\": \"2026-10-05T01:46:00.301928+00:00\"}",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-05T01:46:00.4312162Z"
+  }
+]

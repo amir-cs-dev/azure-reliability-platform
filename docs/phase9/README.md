@@ -1,16 +1,18 @@
 # Phase 9 Kubernetes and deeper observability
 
-Date: 2026-10-04 UTC
+Date: 2026-10-05 UTC
 
-Current verdict: **IMPLEMENTED AND STATICALLY VALIDATED; D2AS_V4 PROVISIONING
-APPROVED; FRESH PLAN AND LIVE ACCEPTANCE OPEN**
+Current verdict: **LIVE ACT-9 PROVISIONING, OBSERVABILITY, FAULT, ROLLBACK,
+AND RECOVERY PASS; CONTROLLED TEARDOWN OPEN**
 
-Phase 9 is not PASS. Stage 1 deliberately stopped before an AKS apply. The
-authoritative sequence remains implemented, tested, demonstrated, evidenced,
-then PASS. The resource and cost gate is in [cost-gate.md](cost-gate.md), the
-exact Stage 1 results are in [stage1-validation.md](stage1-validation.md), the
-controlled live procedure is in [runbook.md](runbook.md), and live evidence
-must be added under [evidence/](evidence/) during Stage 2.
+Phase 9 is not yet PASS because the expensive temporary lab has not been torn
+down. Its implementation, tests, provisioning, deployment, metrics,
+Prometheus, Grafana, Alertmanager, independent Function checking, controlled
+fault, rolling update, rollback, and recovery are demonstrated in the [live
+acceptance report](live-acceptance.md). The resource and cost gate is in
+[cost-gate.md](cost-gate.md), Stage 1 results are in
+[stage1-validation.md](stage1-validation.md), and the controlled procedure is
+in [runbook.md](runbook.md).
 
 The operator approved the exact Stage 1 resource envelope. The subsequent
 [Stage 2 preflight](stage2-preflight.md) found zero West US 3 DASv5-family
@@ -19,6 +21,11 @@ no substitute compute was selected during that attempt. The operator then
 approved the single substitution to one fixed `Standard_D2as_v4` node after
 availability, matching 2-vCPU/8-GiB capacity, and sufficient DASv4-family quota
 were verified. Every other envelope constraint remains unchanged.
+
+Trusted-main plan `37235069628` and separately approved apply `37235364607`
+created only the cluster and two scoped role assignments. The accepted final
+experiment completed on 2026-10-05 UTC. Evidence was retained before starting
+the exact-plan teardown sequence.
 
 ## Architecture
 
@@ -126,23 +133,24 @@ It did not apply anything. Initializing/planning created only an empty,
 non-billable state snapshot at the isolated state key (serial 1, zero tracked
 resources).
 
-## ACT-9 status after Stage 1
+## ACT-9 status before teardown
 
-| ACT-9 requirement | Stage 1 state | Result |
+| ACT-9 requirement | Demonstrated state | Result |
 |---|---|---|
-| AKS provisioned with Terraform | Terraform and exact plan exist; no apply authorized | **OPEN — LIVE** |
-| Kubernetes deployment | Helm chart renders and validates | **OPEN — LIVE** |
-| Readiness/liveness probes | Declared and statically validated | **OPEN — LIVE** |
-| Application metrics | Implemented and locally tested | **OPEN — LIVE** |
-| Prometheus scraping real targets | Discovery/config validated only | **OPEN — LIVE** |
-| Grafana showing real telemetry | Provisioning/dashboard validated only | **OPEN — LIVE** |
-| Alertmanager actionable alert | Rules/route validated only | **OPEN — LIVE** |
-| External checker outside AKS | Existing Function preserved; switch tooling not run | **OPEN — LIVE** |
-| Controlled load/deployment experiment | Guarded tooling implemented, not run | **OPEN — LIVE** |
-| Rolling update | Real revision-change procedure designed, not run | **OPEN — LIVE** |
-| Rollback | Actual Helm rollback procedure designed, not run | **OPEN — LIVE** |
-| Monitoring/alerts/recovery | Evidence capture designed, no live evidence | **OPEN — LIVE** |
-| Reproducibility | Repository instructions and controls implemented | **OPEN — LIVE** |
-| Teardown | Exact destroy workflow/procedure implemented, not demonstrated | **OPEN — LIVE** |
+| AKS provisioned with Terraform | Reviewed three-create plan and separately approved exact-plan apply | **PASS** |
+| Kubernetes deployment | Digest-pinned Helm release and healthy workload inventory | **PASS** |
+| Readiness/liveness probes | Live probe configuration and two Ready/Available replicas | **PASS** |
+| Application metrics | Live request/latency/status/health metrics | **PASS** |
+| Prometheus scraping real targets | Both API pods and kube-state-metrics UP with real query results | **PASS** |
+| Grafana showing real telemetry | Datasource, dashboard, and live numeric query response | **PASS** |
+| Alertmanager actionable alert | Firing measured alert routed to Discord with zero delivery failures | **PASS** |
+| External checker outside AKS | Natural Function healthy/failure/open/recovery sequence | **PASS** |
+| Controlled load/deployment experiment | 986 bounded requests across good/fault/recovery states | **PASS** |
+| Rolling update | New fault revision and ReplicaSet replaced known-good pods | **PASS** |
+| Rollback | Actual Helm rollback restored known-good revision and pods | **PASS** |
+| Monitoring/alerts/recovery | Prometheus, Alertmanager, and Function all observed the chain | **PASS** |
+| Reproducibility | Integrated automation plus green 87-test CI and validators | **PASS** |
+| Teardown | Evidence-safe exact destroy remains to be run | **OPEN** |
 
-No row is marked PASS from Stage 1 repository evidence alone.
+No earlier Stage 1 claim was promoted to live evidence. Phase 9 becomes PASS
+only after the teardown row is demonstrated and integrated.
