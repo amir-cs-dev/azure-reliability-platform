@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   validate:
+    name: CI checks
     runs-on: ubuntu-latest
     services:
       postgres:
