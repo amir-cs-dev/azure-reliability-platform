@@ -1,0 +1,14 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Public immutable image tags in the Incident #2 evidence"
+condition = "AND"
+regexTarget = "line"
+paths = [
+  '''docs/incidents/incident-002\.md''',
+  '''docs/incidents/evidence/incident-002-azure-logs\.md''',
+]
+regexes = [
+  '''reliability-api:[0-9a-f]{40}''',
+]

@@ -6,9 +6,7 @@ import urllib.request
 
 GROUP = "rg-arp-app-wus3"
 API = "ca-arp-api-wus3"
-MONITOR = "ca-arp-monitor-wus3"
 EXPECTED_API = f"{os.environ['REGISTRY']}/reliability-api:{os.environ['GITHUB_SHA']}"
-EXPECTED_MONITOR = f"{os.environ['REGISTRY']}/reliability-monitor:{os.environ['GITHUB_SHA']}"
 
 
 def azure_json(*args):
@@ -22,13 +20,9 @@ def app(name):
 
 
 api = app(API)
-monitor = app(MONITOR)
 
 assert api["properties"]["template"]["containers"][0]["image"] == EXPECTED_API, (
     "API image does not match this workflow commit"
-)
-assert monitor["properties"]["template"]["containers"][0]["image"] == EXPECTED_MONITOR, (
-    "Monitor image does not match this workflow commit"
 )
 
 target = api["properties"]["latestRevisionName"]

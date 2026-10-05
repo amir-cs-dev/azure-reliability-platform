@@ -1,0 +1,7 @@
+-r requirements.txt
+-r azure_function/requirements.txt
+
+httpx==0.28.1
+psycopg[binary]==3.3.6
+pytest==9.1.1
+requests==2.32.5

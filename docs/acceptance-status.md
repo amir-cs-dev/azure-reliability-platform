@@ -4,9 +4,10 @@ Authoritative rule: a phase is complete only when it is implemented, tested,
 demonstrated, evidenced, and its exact acceptance test passes. Code presence,
 plausible tests, Terraform validation, or a green CI run alone is not a PASS.
 
-Last updated: 2026-10-05 UTC after the complete live Phase 9 chain, reviewed
-exact-plan teardown, shared-resource preservation audit, and state
-reconciliation.
+Last updated: 2026-10-05 UTC during the Phase 10 publication audit. Phases 0–9
+remain PASS; Phase 10 stays OPEN until its documentation foundation is
+integrated and the mandatory cold-review reproduction succeeds from a new
+clone of current `origin/main`.
 
 | Phase | Implementation | Tests | Demonstration | Evidence | Status | Exact blocker |
 |---|---|---|---|---|---|---|
@@ -20,7 +21,7 @@ reconciliation.
 | 7 — Observability | Complete for current architecture | Current suite: 62 passed; Phase 8 subset: 8 passed | Incident #2 signals correlated across deployment, checker, App Insights, lifecycle, notification, rollback, and recovery | [Incident #2 timeline](incidents/incident-002.md) and [App Insights evidence](incidents/evidence/incident-002-app-insights.md) | **PASS** | None for ACT-7. Signal limitations and the bounded causal inference are documented. |
 | 8 — Recovery and rollback | Complete | Current suite: 62 passed; verifier/fault subset: 8 passed | Broken revision detected; operator rollback recovered; fixed verifier deployed and passed six samples | [Incident #2 report](incidents/incident-002.md), [Azure logs/database evidence](incidents/evidence/incident-002-azure-logs.md), and [Deploy #4 excerpt](incidents/evidence/incident-002-deploy4.log) | **PASS** | None for ACT-8. The exact early-request revision remains unknowable and is correctly labeled as a limitation, not a fabricated fact. |
 | 9 — Kubernetes / deeper observability | Complete, including controlled teardown | 27 focused Phase 9/control tests and 87-test PostgreSQL-backed full suite pass; all static/CI checks pass | Reviewed create/apply; healthy AKS baseline; live Prometheus/Grafana; routed alert; external Function incident; rolling fault revision; rollback/recovery; reviewed destroy and preservation audit | [Live acceptance report](phase9/live-acceptance.md) and [sanitized artifacts](phase9/evidence/live-20261005/) | **PASS** | None. The lab was removed through the exact-plan approval boundary; shared resources survived and isolated state tracks zero resources. |
-| 10 — Portfolio publication | Open | Final audit not run | Reproduction not demonstrated end-to-end | Final package incomplete | **OPEN** | Complete final documentation, fresh-environment reproduction, and the ACT-0–ACT-10 audit. |
+| 10 — Portfolio publication | Documentation/reviewer foundation complete on audit branch | 87-test suite and static gates pending final branch run | Reproduction script prepared but not yet run from integrated `origin/main` | [Provisional final audit](final-acceptance.md) | **OPEN** | Integrate the reviewer foundation, run the mandatory fresh clone from current `origin/main`, then integrate the final evidence and PASS audit. |
 
 ## Mission 1 result
 
@@ -129,4 +130,4 @@ shared ACR/Container App/Function resources survived, the external checker
 remains healthy against its restored target, and state serial 5 tracks zero
 managed resources. Reconciliation plan `37254291825` proposes only the
 original three creates and was not applied. Phase 9 is **PASS**; Phase 10 has
-not begun.
+now begun but remains OPEN at its explicit fresh-clone gate.
