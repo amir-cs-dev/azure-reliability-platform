@@ -39,26 +39,23 @@ jobs:
           test -n "$ACR"
           echo "ACR=$ACR" >> "$GITHUB_ENV"
           echo "REGISTRY=$ACR.azurecr.io" >> "$GITHUB_ENV"
-      - name: Build immutable images
+      - name: Build immutable application image
         shell: bash
         run: |
           set -euo pipefail
           docker build -t "$REGISTRY/reliability-api:$GITHUB_SHA" .
-          docker build -f Dockerfile.monitor -t "$REGISTRY/reliability-monitor:$GITHUB_SHA" .
-      - name: Push immutable images to existing ACR
+      - name: Push immutable application image to existing ACR
         shell: bash
         run: |
           set -euo pipefail
           az acr login --name "$ACR"
           docker push "$REGISTRY/reliability-api:$GITHUB_SHA"
-          docker push "$REGISTRY/reliability-monitor:$GITHUB_SHA"
-      - name: Deploy both existing Container Apps (preserve secrets and environment)
+      - name: Deploy existing API Container App
         shell: bash
         run: |
           set -euo pipefail
           az containerapp update --resource-group rg-arp-app-wus3 --name ca-arp-api-wus3 --image "$REGISTRY/reliability-api:$GITHUB_SHA" -o none
-          az containerapp update --resource-group rg-arp-app-wus3 --name ca-arp-monitor-wus3 --image "$REGISTRY/reliability-monitor:$GITHUB_SHA" -o none
-      - name: Verify API and monitor deployment
+      - name: Verify API deployment
         shell: bash
         run: |
           set -euo pipefail

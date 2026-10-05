@@ -55,6 +55,8 @@ def test_application_deploy_remains_validation_gated_and_main_only():
     assert "github.ref == 'refs/heads/main'" in deploy
     assert "id-token: write" in deploy
     assert "write-all" not in deploy
+    assert "ca-arp-monitor-wus3" not in deploy
+    assert "reliability-monitor" not in deploy
 
 
 def test_phase9_plan_is_isolated_and_never_applies_automatically():

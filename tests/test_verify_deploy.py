@@ -33,17 +33,15 @@ def configure(monkeypatch, bad_sample=None, never_cutover=False):
         if command[1:3] == ["containerapp", "show"]:
             name = command[command.index("-n") + 1]
 
-            if name == "ca-arp-api-wus3":
-                image = f"{registry}/reliability-api:{sha}"
-            elif name == "ca-arp-monitor-wus3":
-                image = f"{registry}/reliability-monitor:{sha}"
-            else:
+            if name != "ca-arp-api-wus3":
                 raise AssertionError(f"Unexpected app: {name}")
 
             return json.dumps({
                 "properties": {
                     "template": {
-                        "containers": [{"image": image}]
+                        "containers": [{
+                            "image": f"{registry}/reliability-api:{sha}"
+                        }]
                     },
                     "latestRevisionName": "api-new",
                     "configuration": {

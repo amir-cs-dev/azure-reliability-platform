@@ -2,8 +2,10 @@
 set -euo pipefail
 
 root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
-chart="$root/deploy/helm/arp-phase9"
+chart_relative="deploy/helm/arp-phase9"
+chart="$root/$chart_relative"
 rendered=$(mktemp /tmp/arp-phase9-rendered.XXXXXX.yaml)
+helm_workspace=""
 containers=()
 
 cleanup() {
@@ -12,12 +14,28 @@ cleanup() {
     docker rm "$container" >/dev/null 2>&1 || true
   done
   rm -f "$rendered"
+  if [[ -n "$helm_workspace" ]]; then
+    rm -rf "$helm_workspace"
+  fi
 }
 trap cleanup EXIT
 
-helm lint "$chart"
-helm template arp-phase9 "$chart" \
-  --namespace arp-phase9 > "$rendered"
+if command -v helm >/dev/null; then
+  (cd "$root" && helm lint "$chart_relative")
+  (cd "$root" && helm template arp-phase9 "$chart_relative" \
+    --namespace arp-phase9) > "$rendered"
+else
+  helm_workspace=$(mktemp -d /tmp/arp-phase9-helm.XXXXXX)
+  mkdir -p "$helm_workspace/deploy/helm"
+  cp -R "$chart" "$helm_workspace/deploy/helm/arp-phase9"
+  docker run --rm \
+    -v "$helm_workspace:/work" -w /work \
+    alpine/helm:3.19.0 lint "$chart_relative" >/dev/null
+  docker run --rm \
+    -v "$helm_workspace:/work" -w /work \
+    alpine/helm:3.19.0 template arp-phase9 "$chart_relative" \
+      --namespace arp-phase9 > "$rendered"
+fi
 
 docker run --rm -i \
   ghcr.io/yannh/kubeconform:v0.7.0 \

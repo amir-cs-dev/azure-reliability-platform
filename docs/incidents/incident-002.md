@@ -148,9 +148,12 @@ rollback detection time.
 ## Corrective action
 
 PR #5 replaced the single early request loop with `scripts/verify_deploy.py`.
-The verifier now:
+At that deployment, it also checked the then-active monitor image. After the
+Azure Function became authoritative, Phase 10 removed the retired monitor from
+deployment and verification so an API release cannot reactivate it. The final
+verifier:
 
-1. verifies API and monitor images match the workflow commit;
+1. verifies the API image matches the workflow commit;
 2. identifies the exact target API revision;
 3. waits until that target alone has 100% traffic;
 4. waits an additional ten seconds after cutover;
