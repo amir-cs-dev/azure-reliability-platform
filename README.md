@@ -46,7 +46,7 @@ flowchart TB
 
   subgraph LAB[Temporary Phase 9 lab — destroyed after evidence]
     AKS[One-node AKS Free-tier cluster] --> PODS[Digest-pinned API pods]
-    PODS --> METRICS[/metrics]
+    PODS --> METRICS["/metrics"]
     METRICS --> PROM[Prometheus]
     PROM --> GRAFANA[Grafana]
     PROM --> ALERT[Alertmanager]
