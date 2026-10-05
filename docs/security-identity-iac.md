@@ -37,6 +37,16 @@ Tenant, subscription, client, state-account, and operator object IDs are stored
 as non-secret GitHub variables. Runtime database and webhook values are Key
 Vault references.
 
+The final public-release review also inspected GitHub Actions artifacts rather
+than limiting the audit to Git blobs. Saved Terraform plans are ZIP containers
+that include `tfstate` and `tfstate-prev`; the private-repository artifacts
+therefore contained provider-returned values such as Log Analytics shared keys
+and Function publishing credentials even though the human-readable plans
+redacted them. All 15 unexpired plan artifacts were deleted before publication.
+The four plan/apply workflows now reject public repositories before validation,
+OIDC login, plan generation, artifact upload, download, or apply. Metadata-only
+apply evidence remains retained.
+
 Re-run:
 
 ```bash

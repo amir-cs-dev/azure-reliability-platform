@@ -31,6 +31,8 @@ def test_plan_is_separate_from_apply_and_retains_review_artifact():
     assert "TF_VAR_key_vault_operator_object_id" in plan
     assert '"$RUNNER_TEMP/plan.json"' in plan
     assert "retention-days: 7" in plan
+    assert "Refuse public binary-plan publication" in plan
+    assert "github.event.repository.private" in plan
 
 
 def test_apply_is_manual_main_only_and_checks_exact_plan_identity():
@@ -46,6 +48,8 @@ def test_apply_is_manual_main_only_and_checks_exact_plan_identity():
     assert "CURRENT_MAIN_SHA" in apply
     assert "terraform_plan_artifact.py validate" in apply
     assert 'apply -input=false -auto-approve "$PLAN_FILE"' in apply
+    assert "Refuse public binary-plan consumption" in apply
+    assert "github.event.repository.private" in apply
 
 
 def test_application_deploy_remains_validation_gated_and_main_only():
@@ -68,6 +72,8 @@ def test_phase9_plan_is_isolated_and_never_applies_automatically():
     assert "terraform apply" not in plan
     assert "infra/phase9" in plan
     assert "retention-days: 7" in plan
+    assert "Refuse public binary-plan publication" in plan
+    assert "github.event.repository.private" in plan
 
 
 def test_phase9_apply_requires_exact_manual_current_main_plan():
@@ -82,3 +88,5 @@ def test_phase9_apply_requires_exact_manual_current_main_plan():
     assert "id-token: write" in apply
     assert "AZURE_PHASE9_TERRAFORM_APPLY_CLIENT_ID" in apply
     assert "AZURE_TERRAFORM_APPLY_CLIENT_ID" not in apply
+    assert "Refuse public binary-plan consumption" in apply
+    assert "github.event.repository.private" in apply
