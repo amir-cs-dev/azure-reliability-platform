@@ -309,8 +309,10 @@ in [Incident #2 Azure evidence](../incidents/evidence/incident-002-azure-logs.md
   caused by the intentionally separate CLI application deployment path. It was
   reviewed and not applied. Full Terraform/application ownership reconciliation
   remains future work, but does not weaken the demonstrated plan/apply gate.
-- Binary plans can contain sensitive data, so artifacts are private and retained
-  for seven days. This report preserves non-sensitive metadata and digests.
+- Binary plans can contain sensitive data. The reviewed Phase 6 control operated
+  while the repository was private. Before public release, retained plan
+  artifacts were deleted and the plan/apply workflows were made fail-closed for
+  public repositories; this report preserves non-sensitive metadata and digests.
 - Current pinned Action releases emit GitHub's Node.js 20 forced-to-24 migration
   warning, and `ubuntu-latest` has a future image migration notice. Neither
   warning changed the demonstrated results; dependency updates should be

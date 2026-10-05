@@ -41,7 +41,22 @@ env:
   KEY_VAULT_OPERATOR_OBJECT_ID: ${{ vars.KEY_VAULT_OPERATOR_OBJECT_ID }}
 
 jobs:
+  private-repository-only:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refuse public binary-plan publication
+        env:
+          REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$REPOSITORY_PRIVATE" == "true" ]] || {
+            echo "Refusing Terraform plan: binary plans embed state and must not be published as public-repository artifacts." >&2
+            exit 1
+          }
+
   validate:
+    needs: private-repository-only
     uses: ./.github/workflows/ci.yml
     permissions:
       contents: read

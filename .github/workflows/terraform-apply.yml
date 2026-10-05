@@ -33,7 +33,22 @@ env:
   TF_STATE_STORAGE_ACCOUNT: ${{ vars.TF_STATE_STORAGE_ACCOUNT }}
 
 jobs:
+  private-repository-only:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refuse public binary-plan consumption
+        env:
+          REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$REPOSITORY_PRIVATE" == "true" ]] || {
+            echo "Refusing Terraform apply: reviewed binary plans must remain private." >&2
+            exit 1
+          }
+
   apply:
+    needs: private-repository-only
     runs-on: ubuntu-latest
     permissions:
       actions: read

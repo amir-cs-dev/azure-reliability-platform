@@ -193,13 +193,19 @@ resource group as part of Phase 9 cleanup.
 
 ## Security and identity
 
-The repository contains no Azure client secret, password, connection string,
+The Git repository contains no Azure client secret, password, connection string,
 Discord webhook, kubeconfig, Terraform state, binary plan, or private key.
 GitHub Actions has zero repository/environment secrets; non-secret IDs live in
 variables. Runtime secrets are Key Vault references. Azure access uses
 repository-ID-bound GitHub OIDC identities separated across deployment,
 read-oriented planning, persistent apply, and Phase 9 apply. Managed identities
 handle ACR pull and Function storage/Key Vault access.
+
+Saved Terraform plans embed state and can contain provider-returned credentials.
+The plan/apply workflows therefore fail closed when the repository is public;
+they may create or consume binary-plan artifacts only while the repository is
+private. The sanitized summaries, hashes, and acceptance evidence remain safe
+to publish.
 
 The audited role scopes, remote-state design, resource classification,
 history-aware secret scan, and known privilege tradeoffs are in [Security,
