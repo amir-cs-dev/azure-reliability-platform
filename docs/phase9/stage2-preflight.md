@@ -131,5 +131,7 @@ may proceed only after a new current-`main` plan proves all of the following:
 4. every other approved resource and teardown constraint remains unchanged.
 
 Any material difference beyond the approved SKU substitution requires new
-approval. Phase 9 remains OPEN. No ACT-9 live row or teardown row passes from
-this preflight.
+approval. At this preflight checkpoint, Phase 9 remained OPEN; no ACT-9 live
+row or teardown row passed from preflight alone. The subsequent complete live
+chain and controlled teardown are documented in
+[`live-acceptance.md`](live-acceptance.md), which records the final PASS.

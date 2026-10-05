@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "host": "func-arp-monitor-3e6c8737-wus3.azurewebsites.net",
+  "id": "/subscriptions/3e6c8737-fb3a-44be-8477-45e2f66a45f5/resourceGroups/rg-arp-app-wus3/providers/Microsoft.Web/sites/func-arp-monitor-3e6c8737-wus3",
+  "name": "func-arp-monitor-3e6c8737-wus3",
+  "state": "Running",
+  "type": "Microsoft.Web/sites"
+}

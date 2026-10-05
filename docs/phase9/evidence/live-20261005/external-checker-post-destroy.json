@@ -1,0 +1,32 @@
+[
+  {
+    "Message": "{\"consecutive_failures\": 0, \"event\": \"scheduled_monitor_completed\", \"healthy\": true, \"latency_ms\": 93.91, \"lifecycle_event\": null, \"persistence\": \"succeeded\", \"status_code\": 200, \"timestamp\": \"2026-10-05T02:09:00.159322+00:00\"}",
+    "SeverityLevel": "1",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-05T02:09:00.3221407Z"
+  },
+  {
+    "Message": "{\"consecutive_failures\": 0, \"event\": \"scheduled_monitor_completed\", \"healthy\": true, \"latency_ms\": 74.16, \"lifecycle_event\": null, \"persistence\": \"succeeded\", \"status_code\": 200, \"timestamp\": \"2026-10-05T02:08:00.151439+00:00\"}",
+    "SeverityLevel": "1",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-05T02:08:00.3188688Z"
+  },
+  {
+    "Message": "{\"consecutive_failures\": 0, \"event\": \"scheduled_monitor_completed\", \"healthy\": true, \"latency_ms\": 78.69, \"lifecycle_event\": null, \"persistence\": \"succeeded\", \"status_code\": 200, \"timestamp\": \"2026-10-05T02:07:00.151497+00:00\"}",
+    "SeverityLevel": "1",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-05T02:07:00.3208077Z"
+  },
+  {
+    "Message": "{\"consecutive_failures\": 0, \"event\": \"scheduled_monitor_completed\", \"healthy\": true, \"latency_ms\": 89.93, \"lifecycle_event\": null, \"persistence\": \"succeeded\", \"status_code\": 200, \"timestamp\": \"2026-10-05T02:06:00.158911+00:00\"}",
+    "SeverityLevel": "1",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-05T02:06:00.3315115Z"
+  },
+  {
+    "Message": "{\"consecutive_failures\": 0, \"event\": \"scheduled_monitor_completed\", \"healthy\": true, \"latency_ms\": 92.59, \"lifecycle_event\": null, \"persistence\": \"succeeded\", \"status_code\": 200, \"timestamp\": \"2026-10-05T02:05:00.172408+00:00\"}",
+    "SeverityLevel": "1",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-05T02:05:00.3837944Z"
+  }
+]
