@@ -4,24 +4,23 @@ Authoritative rule: a phase is complete only when it is implemented, tested,
 demonstrated, evidenced, and its exact acceptance test passes. Code presence,
 plausible tests, Terraform validation, or a green CI run alone is not a PASS.
 
-Last updated: 2026-10-05 UTC during the Phase 10 publication audit. Phases 0–9
-remain PASS; Phase 10 stays OPEN until its documentation foundation is
-integrated and the mandatory cold-review reproduction succeeds from a new
-clone of current `origin/main`.
+Last updated: 2026-10-05 UTC after the Phase 10 publication/security/IaC audit,
+legacy-scheduler reconciliation, and mandatory cold-review reproduction from a
+new clone of integrated `origin/main`. All phases are PASS.
 
 | Phase | Implementation | Tests | Demonstration | Evidence | Status | Exact blocker |
 |---|---|---|---|---|---|---|
 | 0 — Repository and scope | Complete | Complete | Complete | Complete | **PASS** | None. |
-| 1 — Monitored application | Complete | 8 focused endpoint/fault tests and 62 current full-suite tests pass | Normal app plus semantic-health and HTTP-500 faults demonstrated from one Docker image | [ACT-1 application and Docker evidence](phase1-application.md) | **PASS** | None. Both faults are environment-driven; no public fault-control endpoint exists. |
-| 2 — External checker | Complete | 6 focused checker tests, 14 checker/history/runner tests, and 62 full-suite tests pass | Healthy, HTTP failure, semantic invalidity, timeout, connection failure, invalid JSON, and complete result shape demonstrated | [ACT-2 external checker evidence](phase2-external-checker.md) | **PASS** | None. Every success and failure path returns timestamp, classification/status, latency, and applicable error information. |
-| 3 — Azure workload | Complete | Deployment checks exist | Externally reachable Azure deployment established | Existing cloud evidence | **PASS** | None. |
-| 4 — Monitoring service | Python 3.12 timer Function and Terraform Flex Consumption resources complete | 11 focused Function/packaging/Terraform tests and 74 full-suite tests pass | Three natural Azure timer executions correlated with rows `96801`–`96803`; previous scheduler inactive | [ACT-4 Azure Function evidence](phase4-azure-function.md) | **PASS** | None. Terraform, timer, identity, persistence, logging, laptop independence, safe cutover, and duplicate protection are demonstrated. |
-| 5 — Incident lifecycle | Complete | Deterministic PostgreSQL overlap test plus lifecycle/dedup suites pass | Incident #2 lifecycle demonstrated; two overlapping threshold checks serialize to one opening | [Incident #2 report](incidents/incident-002.md) and [concurrency proof](phase5-concurrency.md) | **PASS** | None. The production state-row lock was directly observed blocking the second execution; exactly one incident and one opening-notification row persisted. |
-| 6 — CI/CD and infrastructure automation | Complete | Current suite: 62 passed; 14 focused control tests; 4 verifier tests | Reviewed normal/refresh plans, separate approved state-only apply, live rejection controls, failed-test deployment block, and healthy Deploy #5 demonstrated | [ACT-6 acceptance evidence](ci-cd/phase6-acceptance.md) | **PASS** | None. Approval is an explicitly demonstrated solo-operator manual boundary, not a claimed GitHub required-reviewer environment. |
-| 7 — Observability | Complete for current architecture | Current suite: 62 passed; Phase 8 subset: 8 passed | Incident #2 signals correlated across deployment, checker, App Insights, lifecycle, notification, rollback, and recovery | [Incident #2 timeline](incidents/incident-002.md) and [App Insights evidence](incidents/evidence/incident-002-app-insights.md) | **PASS** | None for ACT-7. Signal limitations and the bounded causal inference are documented. |
-| 8 — Recovery and rollback | Complete | Current suite: 62 passed; verifier/fault subset: 8 passed | Broken revision detected; operator rollback recovered; fixed verifier deployed and passed six samples | [Incident #2 report](incidents/incident-002.md), [Azure logs/database evidence](incidents/evidence/incident-002-azure-logs.md), and [Deploy #4 excerpt](incidents/evidence/incident-002-deploy4.log) | **PASS** | None for ACT-8. The exact early-request revision remains unknowable and is correctly labeled as a limitation, not a fabricated fact. |
+| 1 — Monitored application | Complete | 8 focused endpoint/fault tests and 87-test full suite pass | Normal app plus semantic-health and HTTP-500 faults demonstrated from one Docker image | [ACT-1 application and Docker evidence](phase1-application.md) | **PASS** | None. Both faults are environment-driven; no public fault-control endpoint exists. |
+| 2 — External checker | Complete | 6 focused checker tests and 87-test full suite pass | Healthy, HTTP failure, semantic invalidity, timeout, connection failure, invalid JSON, and complete result shape demonstrated | [ACT-2 external checker evidence](phase2-external-checker.md) | **PASS** | None. Every success and failure path returns timestamp, classification/status, latency, and applicable error information. |
+| 3 — Azure workload | Complete | 4 deployment-verifier tests and 87-test full suite pass | Externally reachable root, health, and readiness established | Final live verification and existing cloud evidence | **PASS** | None. |
+| 4 — Monitoring service | Python 3.12 timer Function and Terraform Flex Consumption resources complete | 11 focused Function/packaging/Terraform tests and 87-test full suite pass | Natural Azure timer executions persist and log continuously; legacy scheduler stopped | [ACT-4 Azure Function evidence](phase4-azure-function.md) | **PASS** | None. Terraform, timer, identity, persistence, logging, laptop independence, safe cutover, and duplicate protection are demonstrated. |
+| 5 — Incident lifecycle | Complete | 3 PostgreSQL integration tests and 87-test full suite pass | Incident #2 lifecycle demonstrated; two overlapping threshold checks serialize to one opening | [Incident #2 report](incidents/incident-002.md) and [concurrency proof](phase5-concurrency.md) | **PASS** | None. The production state-row lock was directly observed blocking the second execution; exactly one incident and one opening-notification row persisted. |
+| 6 — CI/CD and infrastructure automation | Complete | 87-test suite, 20 Terraform/workflow-control tests, and 4 verifier tests pass | Reviewed normal/refresh plans, separate approved state-only apply, live rejection controls, failed-test deployment block, and healthy Deploy #5 demonstrated | [ACT-6 acceptance evidence](ci-cd/phase6-acceptance.md) | **PASS** | None. Approval is an explicitly demonstrated solo-operator manual boundary, not a claimed GitHub required-reviewer environment. |
+| 7 — Observability | Complete for persistent Azure and temporary/reproducible Kubernetes layers | 87-test suite plus metrics/observability static validation pass | Incident #2 and Phase 9 signals correlated across checker, App Insights, lifecycle, notification, Prometheus, Grafana, Alertmanager, rollback, and recovery | [Final observability audit](final-acceptance.md#observability-audit) | **PASS** | None. Signal limitations and the bounded causal inference are documented. |
+| 8 — Recovery and rollback | Complete | 87-test suite, 8 endpoint/fault tests, and 4 verifier tests pass | Broken revision detected; Container Apps and Helm rollbacks recovered; corrected verifier passed six samples | [Incident #2 report](incidents/incident-002.md) and [Phase 9 live acceptance](phase9/live-acceptance.md) | **PASS** | None. The exact early Incident #2 request revision remains unknowable and is correctly labeled as a limitation. |
 | 9 — Kubernetes / deeper observability | Complete, including controlled teardown | 27 focused Phase 9/control tests and 87-test PostgreSQL-backed full suite pass; all static/CI checks pass | Reviewed create/apply; healthy AKS baseline; live Prometheus/Grafana; routed alert; external Function incident; rolling fault revision; rollback/recovery; reviewed destroy and preservation audit | [Live acceptance report](phase9/live-acceptance.md) and [sanitized artifacts](phase9/evidence/live-20261005/) | **PASS** | None. The lab was removed through the exact-plan approval boundary; shared resources survived and isolated state tracks zero resources. |
-| 10 — Portfolio publication | Documentation/reviewer foundation complete on audit branch | 87-test suite and static gates pending final branch run | Reproduction script prepared but not yet run from integrated `origin/main` | [Provisional final audit](final-acceptance.md) | **OPEN** | Integrate the reviewer foundation, run the mandatory fresh clone from current `origin/main`, then integrate the final evidence and PASS audit. |
+| 10 — Portfolio publication | Complete | 8 application/fault, 6 checker, and 87 full tests pass; all local/static/security gates pass | New clone of integrated `origin/main` completed the documented reviewer path and 20-question cold review | [Final audit](final-acceptance.md) and [fresh-clone evidence](phase10/fresh-clone-review.md) | **PASS** | None. Architecture, operations, identity, IaC/state, security, reliability, observability, cost, teardown, limitations, and reproduction are independently reviewable. |
 
 ## Mission 1 result
 
@@ -129,5 +128,22 @@ those three resources. AKS and its managed node resource group are absent,
 shared ACR/Container App/Function resources survived, the external checker
 remains healthy against its restored target, and state serial 5 tracks zero
 managed resources. Reconciliation plan `37254291825` proposes only the
-original three creates and was not applied. Phase 9 is **PASS**; Phase 10 has
-now begun but remains OPEN at its explicit fresh-clone gate.
+original three creates and was not applied. Phase 9 is **PASS**; at that
+checkpoint Phase 10 had not begun.
+
+## Mission 7 result
+
+The final repository landing page and linked documentation now distinguish the
+persistent platform from the destroyed/reproducible AKS lab and cover the full
+architecture, operations, identity, IaC/state, testing, security, reliability,
+observability, cost, rollback, teardown, limitations, and evidence record. The
+legacy Container App monitor is explicitly stopped, cannot be reactivated by
+the deployment workflow, and no longer has a production-deployer role.
+
+Documentation/reviewer foundation PR #28 merged after green CI. A new clone of
+that integrated `origin/main` then passed 8 focused application/fault tests, 6
+focused checker tests, all 87 tests, both Docker fault demonstrations, both
+Terraform roots, Helm/21 Kubernetes resources, Prometheus, Alertmanager,
+Grafana, Actionlint, relative-link validation, and a 37-commit Gitleaks scan.
+The clone remained clean. ACT-10 and all nine cross-cutting rows are therefore
+**PASS**.

@@ -7,7 +7,8 @@ temporary AKS observability lab.
 
 The project is evidence-gated: **implemented → tested → demonstrated →
 evidenced → PASS**. The authoritative status and final audit are in
-[Phase acceptance status](docs/acceptance-status.md).
+[Phase acceptance status](docs/acceptance-status.md). All Phases 0–10 and all
+cross-cutting domains pass.
 
 ## What this system demonstrates
 
@@ -170,6 +171,9 @@ Prometheus, Alertmanager, and Grafana configuration. It does not authenticate
 to Azure, modify production, or provision AKS. Manual commands, configuration,
 cloud procedures, and expected output are in the [Reviewer reproduction
 guide](docs/reproduction.md).
+
+This exact path passed from a new clone of integrated `origin/main`; see the
+[Phase 10 fresh-clone evidence](docs/phase10/fresh-clone-review.md).
 
 ## Cost and teardown
 
