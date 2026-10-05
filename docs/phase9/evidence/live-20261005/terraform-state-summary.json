@@ -1,0 +1,21 @@
+{
+  "lineage": "3fb12007-bf85-15a3-843c-a31a6157b798",
+  "serial": 3,
+  "managed_resources": [
+    {
+      "type": "azurerm_kubernetes_cluster",
+      "name": "phase9",
+      "instances": 1
+    },
+    {
+      "type": "azurerm_role_assignment",
+      "name": "aks_acr_pull",
+      "instances": 1
+    },
+    {
+      "type": "azurerm_role_assignment",
+      "name": "operator_cluster_admin",
+      "instances": 1
+    }
+  ]
+}

@@ -2,7 +2,12 @@
 
 Date: 2026-10-04 UTC
 
-Verdict: **DASV5 BLOCKER RESOLVED BY APPROVED D2AS_V4 SUBSTITUTION; FRESH PLAN REQUIRED**
+Historical pre-apply verdict: **DASV5 BLOCKER RESOLVED BY APPROVED D2AS_V4
+SUBSTITUTION; FRESH PLAN REQUIRED**
+
+Outcome: trusted-main D2as_v4 plan `37235069628` passed the unchanged envelope
+audit and exact-plan apply `37235364607` succeeded. The complete live result is
+in the [acceptance report](live-acceptance.md).
 
 The operator explicitly approved the Stage 2 cost envelope: Free-tier AKS,
 one fixed `Standard_D2as_v5` system node, no other node pools, in-cluster

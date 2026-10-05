@@ -1,0 +1,1 @@
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"kube_deployment_status_replicas_available","deployment":"arp-api","instance":"arp-kube-state-metrics:8080","job":"kube-state-metrics","namespace":"arp-phase9"},"value":[1791164286.580,"2"]}]}}

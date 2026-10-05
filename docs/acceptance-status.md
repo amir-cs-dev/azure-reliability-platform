@@ -4,9 +4,8 @@ Authoritative rule: a phase is complete only when it is implemented, tested,
 demonstrated, evidenced, and its exact acceptance test passes. Code presence,
 plausible tests, Terraform validation, or a green CI run alone is not a PASS.
 
-Last updated: 2026-10-04 UTC after Mission 6 Stage 2 approval, provider and
-identity preflight, the Azure quota rejection, and approval of the single
-D2as_v4 compute substitution.
+Last updated: 2026-10-05 UTC after the reviewed D2as_v4 apply and complete live
+Phase 9 baseline, fault, alert, rolling-update, rollback, and recovery chain.
 
 | Phase | Implementation | Tests | Demonstration | Evidence | Status | Exact blocker |
 |---|---|---|---|---|---|---|
@@ -19,7 +18,7 @@ D2as_v4 compute substitution.
 | 6 — CI/CD and infrastructure automation | Complete | Current suite: 62 passed; 14 focused control tests; 4 verifier tests | Reviewed normal/refresh plans, separate approved state-only apply, live rejection controls, failed-test deployment block, and healthy Deploy #5 demonstrated | [ACT-6 acceptance evidence](ci-cd/phase6-acceptance.md) | **PASS** | None. Approval is an explicitly demonstrated solo-operator manual boundary, not a claimed GitHub required-reviewer environment. |
 | 7 — Observability | Complete for current architecture | Current suite: 62 passed; Phase 8 subset: 8 passed | Incident #2 signals correlated across deployment, checker, App Insights, lifecycle, notification, rollback, and recovery | [Incident #2 timeline](incidents/incident-002.md) and [App Insights evidence](incidents/evidence/incident-002-app-insights.md) | **PASS** | None for ACT-7. Signal limitations and the bounded causal inference are documented. |
 | 8 — Recovery and rollback | Complete | Current suite: 62 passed; verifier/fault subset: 8 passed | Broken revision detected; operator rollback recovered; fixed verifier deployed and passed six samples | [Incident #2 report](incidents/incident-002.md), [Azure logs/database evidence](incidents/evidence/incident-002-azure-logs.md), and [Deploy #4 excerpt](incidents/evidence/incident-002-deploy4.log) | **PASS** | None for ACT-8. The exact early-request revision remains unknowable and is correctly labeled as a limitation, not a fabricated fact. |
-| 9 — Kubernetes / deeper observability | Stage 1 complete; exact envelope and single D2as_v4 substitution approved; providers and secretless apply identity complete | 25 focused tests and 85-test PostgreSQL-backed full suite pass; all static/CI checks pass | Not run; no AKS apply occurred | [Stage 1 design](phase9/README.md), [cost gate](phase9/cost-gate.md), [Stage 2 preflight](phase9/stage2-preflight.md), and [runbook](phase9/runbook.md); live evidence intentionally empty | **OPEN — PROVISIONING APPROVED** | Generate and audit a fresh trusted-main D2as_v4 plan, then execute live ACT-9 and teardown. |
+| 9 — Kubernetes / deeper observability | Complete through recovered Helm revision 7; teardown automation ready | 27 focused Phase 9/control tests and 87-test PostgreSQL-backed full suite pass; all static/CI checks pass | Reviewed Terraform apply; healthy AKS baseline; live Prometheus/Grafana; routed alert; external Function incident; rolling fault revision; actual rollback and recovery | [Live acceptance report](phase9/live-acceptance.md) and [sanitized artifacts](phase9/evidence/live-20261005/) | **OPEN — TEARDOWN PENDING** | Remove Helm workloads, apply an exact three-resource destroy plan, and prove shared-resource preservation plus zero-resource state. |
 | 10 — Portfolio publication | Open | Final audit not run | Reproduction not demonstrated end-to-end | Final package incomplete | **OPEN** | Complete after live Phase 9 evidence, IaC reconciliation, final documentation, fresh-environment reproduction, and ACT-0–ACT-10 audit. |
 
 ## Mission 1 result
@@ -100,3 +99,25 @@ no cluster or node resource group exists. The operator subsequently approved
 only a `Standard_D2as_v4` substitution after its availability, matching
 2-vCPU/8-GiB class, and sufficient DASv4 quota were verified. Phase 9 remains
 OPEN pending a fresh trusted-main plan, live ACT-9, evidence, and teardown.
+
+## Mission 6 Stage 2 live acceptance result
+
+The approved D2as_v4 substitution was integrated through green CI. Trusted-main
+plan `37235069628` proposed exactly the AKS cluster and two scoped role
+assignments; separate apply run `37235364607` applied that exact artifact. The
+cluster ran one fixed D2as_v4 system node with the Free tier and no managed
+observability service or extra pool.
+
+The complete accepted experiment began from a healthy baseline and used one
+immutable application digest. Prometheus scraped both API pods and real cluster
+state, Grafana returned live telemetry, and Helm revision 6 performed a real
+rolling update into the controlled HTTP-500 mode. Prometheus fired the measured
+alert, Alertmanager routed it through the existing Discord receiver with zero
+delivery failures, and the external Azure Function independently opened an
+incident on its second failure. Actual rollback created recovered revision 7;
+the endpoint, both Prometheus health series, Alertmanager active-alert state,
+and Function lifecycle all recovered. The Function target was then restored to
+the original external application and subsequent timer runs remained healthy.
+
+Thirteen of fourteen matrix rows pass. Phase 9 remains OPEN solely because the
+required evidence-safe teardown and preservation audit have not yet been run.

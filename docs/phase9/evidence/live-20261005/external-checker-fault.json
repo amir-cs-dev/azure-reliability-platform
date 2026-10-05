@@ -1,0 +1,38 @@
+[
+  {
+    "Message": "{\"event\": \"scheduled_monitor_started\", \"past_due\": false, \"target\": \"http://4.236.60.185/health\", \"timestamp\": \"2026-10-05T01:40:00.005962+00:00\"}",
+    "SeverityLevel": "1",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-05T01:40:00.0168195Z"
+  },
+  {
+    "Message": "{\"consecutive_failures\": 0, \"event\": \"scheduled_monitor_completed\", \"healthy\": true, \"latency_ms\": 6.21, \"lifecycle_event\": null, \"persistence\": \"succeeded\", \"status_code\": 200, \"timestamp\": \"2026-10-05T01:40:00.113196+00:00\"}",
+    "SeverityLevel": "1",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-05T01:40:00.2966205Z"
+  },
+  {
+    "Message": "{\"event\": \"scheduled_monitor_started\", \"past_due\": false, \"target\": \"http://4.236.60.185/health\", \"timestamp\": \"2026-10-05T01:41:00.008089+00:00\"}",
+    "SeverityLevel": "1",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-05T01:41:00.0108589Z"
+  },
+  {
+    "Message": "{\"consecutive_failures\": 1, \"event\": \"scheduled_monitor_completed\", \"healthy\": false, \"latency_ms\": 5.95, \"lifecycle_event\": null, \"persistence\": \"succeeded\", \"status_code\": 500, \"timestamp\": \"2026-10-05T01:41:00.144252+00:00\"}",
+    "SeverityLevel": "1",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-05T01:41:00.2779879Z"
+  },
+  {
+    "Message": "{\"event\": \"scheduled_monitor_started\", \"past_due\": false, \"target\": \"http://4.236.60.185/health\", \"timestamp\": \"2026-10-05T01:42:00.000210+00:00\"}",
+    "SeverityLevel": "1",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-05T01:42:00.0027495Z"
+  },
+  {
+    "Message": "{\"consecutive_failures\": 2, \"event\": \"scheduled_monitor_completed\", \"healthy\": false, \"latency_ms\": 8.36, \"lifecycle_event\": \"INCIDENT_OPENED\", \"persistence\": \"succeeded\", \"status_code\": 500, \"timestamp\": \"2026-10-05T01:42:00.118970+00:00\"}",
+    "SeverityLevel": "1",
+    "TableName": "PrimaryResult",
+    "TimeGenerated": "2026-10-05T01:42:00.6855084Z"
+  }
+]

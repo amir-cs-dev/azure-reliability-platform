@@ -1,0 +1,44 @@
+[
+  {
+    "location": "westus3",
+    "name": "65cefe76-fab5-47c9-9408-4dc800f8eaa5",
+    "sku": "Standard",
+    "type": "Microsoft.Network/publicIPAddresses"
+  },
+  {
+    "location": "westus3",
+    "name": "kubernetes",
+    "sku": "Standard",
+    "type": "Microsoft.Network/loadBalancers"
+  },
+  {
+    "location": "westus3",
+    "name": "aks-arp-phase9-wus3-agentpool",
+    "sku": null,
+    "type": "Microsoft.ManagedIdentity/userAssignedIdentities"
+  },
+  {
+    "location": "westus3",
+    "name": "aks-agentpool-42764726-nsg",
+    "sku": null,
+    "type": "Microsoft.Network/networkSecurityGroups"
+  },
+  {
+    "location": "westus3",
+    "name": "aks-vnet-42764726",
+    "sku": null,
+    "type": "Microsoft.Network/virtualNetworks"
+  },
+  {
+    "location": "westus3",
+    "name": "aks-system-25788750-vmss",
+    "sku": "Standard_D2as_v4",
+    "type": "Microsoft.Compute/virtualMachineScaleSets"
+  },
+  {
+    "location": "westus3",
+    "name": "kubernetes-a1412a917ddd94fbf953a5b3bf842cf1",
+    "sku": "Standard",
+    "type": "Microsoft.Network/publicIPAddresses"
+  }
+]
